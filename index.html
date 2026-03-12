@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NNCHS — Guidance System</title>
- <link rel="icon" type="image/x-icon" href="icon.jpg">
+<link rel="icon" type="image/x-icon" href="icon.jpg">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -25,7 +25,6 @@
   body {
     font-family: 'Sora', sans-serif;
     background: #f6f7f9;
-    background-image: none;
     color: var(--dark);
     min-height: 100vh;
     display: flex;
@@ -33,6 +32,132 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* ════════════════════════════════
+     ANIMATION KEYFRAMES
+  ════════════════════════════════ */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-28px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(28px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── PAGE LOAD: topbar, hero, welcome, slideshow ── */
+  .topbar       { animation: fadeInDown 0.5s cubic-bezier(.4,0,.2,1) both; }
+  .hero-banner  { animation: fadeIn 0.65s 0.1s cubic-bezier(.4,0,.2,1) both; }
+
+  .hero-school-name { animation: fadeInLeft 0.6s 0.22s cubic-bezier(.4,0,.2,1) both; }
+  .hero-desc        { animation: fadeInLeft 0.6s 0.34s cubic-bezier(.4,0,.2,1) both; }
+  .hero-location    { animation: fadeInLeft 0.6s 0.44s cubic-bezier(.4,0,.2,1) both; }
+  .hero-category    { animation: fadeInLeft 0.6s 0.52s cubic-bezier(.4,0,.2,1) both; }
+
+  .welcome-card  { animation: fadeInLeft  0.65s 0.4s  cubic-bezier(.4,0,.2,1) both; }
+  .slideshow-card{ animation: fadeInRight 0.65s 0.5s  cubic-bezier(.4,0,.2,1) both; }
+
+  /* ════════════════════════════════
+     SCROLL-REVEAL SYSTEM
+  ════════════════════════════════ */
+  /* Generic reveal — fade up */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity  0.7s cubic-bezier(.4,0,.2,1),
+      transform 0.7s cubic-bezier(.4,0,.2,1);
+    will-change: opacity, transform;
+  }
+  .reveal.reveal-left  { transform: translateX(-32px); }
+  .reveal.reveal-right { transform: translateX( 32px); }
+  .reveal.reveal-scale { transform: scale(0.92); }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+
+  /* VMV cards — staggered fade-up */
+  .vmv-card {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity   0.6s cubic-bezier(.4,0,.2,1),
+      transform 0.6s cubic-bezier(.4,0,.2,1),
+      box-shadow 0.22s, border-color 0.22s;
+  }
+  .vmv-card.card-visible { opacity: 1; transform: translateY(0); }
+  .vmv-card.card-visible:hover { box-shadow: 0 6px 28px rgba(0,0,0,.08); transform: translateY(-2px); }
+
+  /* GS cards — staggered pop-up */
+  .gs-card {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    transition:
+      opacity   0.5s cubic-bezier(.4,0,.2,1),
+      transform 0.5s cubic-bezier(.4,0,.2,1),
+      border-color 0.22s, box-shadow 0.22s;
+  }
+  .gs-card.card-visible { opacity: 1; transform: translateY(0) scale(1); }
+  .gs-card.card-visible:hover {
+    border-color: #0d1117;
+    box-shadow: 0 6px 24px rgba(0,0,0,.09);
+    transform: translateY(-3px) scale(1);
+  }
+  .gs-card.gs-open { border-color: #0d1117; box-shadow: 0 6px 24px rgba(0,0,0,.09); }
+
+  /* Map reveal */
+  #map {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity   0.75s 0.15s cubic-bezier(.4,0,.2,1),
+      transform 0.75s 0.15s cubic-bezier(.4,0,.2,1);
+  }
+  #map.map-visible { opacity: 1; transform: none; }
+
+  /* Footer reveal */
+  .site-footer {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity   0.65s cubic-bezier(.4,0,.2,1),
+      transform 0.65s cubic-bezier(.4,0,.2,1);
+  }
+  .site-footer.footer-visible { opacity: 1; transform: none; }
+
+  /* Animated underline on section titles when revealed */
+  .section-title-text { position: relative; display: inline-block; }
+  .section-title-text::after {
+    content: '';
+    display: block;
+    height: 3px;
+    width: 0;
+    background: var(--primary);
+    border-radius: 2px;
+    margin: 6px auto 0;
+    transition: width 0.65s 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  .reveal.visible .section-title-text::after { width: 55%; }
+
+  /* ════════════════════════════════
+     ORIGINAL STYLES (unchanged)
+  ════════════════════════════════ */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 90; backdrop-filter: blur(2px); }
   .overlay.open { display: block; }
 
@@ -48,7 +173,7 @@
   .close-btn:hover { background: rgba(255,255,255,0.12); }
   .close-btn svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.6); }
 
-  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; width: 100%; background: #f6f7f9; background-image: none; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; width: 100%; background: #f6f7f9; }
 
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
   .topbar-left { display: flex; align-items: center; gap: 14px; }
@@ -60,37 +185,14 @@
   .page-title .sep { color: var(--border); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-  .search-bar {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--bg); border: 1.5px solid var(--border);
-    border-radius: 999px; padding: 7px 16px;
-    transition: border 0.18s, box-shadow 0.18s;
-    width: 220px;
-  }
-  .search-bar:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(30,77,183,0.08);
-  }
+  .search-bar { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 16px; transition: border 0.18s, box-shadow 0.18s; width: 220px; }
+  .search-bar:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,77,183,0.08); }
   .search-bar svg { flex-shrink: 0; color: var(--light); transition: color 0.18s; }
   .search-bar:focus-within svg { color: var(--primary); }
-  .search-bar input {
-    border: none; background: transparent; outline: none;
-    font-size: 13px; font-family: 'Sora', sans-serif;
-    color: var(--dark); width: 100%;
-  }
+  .search-bar input { border: none; background: transparent; outline: none; font-size: 13px; font-family: 'Sora', sans-serif; color: var(--dark); width: 100%; }
   .search-bar input::placeholder { color: var(--light); }
 
-  .hero-banner {
-    background: #ffffff;
-    background-image: none;
-    padding: 28px 40px;
-    display: flex;
-    align-items: center;
-    gap: 26px;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 2px solid #e4e7ef;
-  }
+  .hero-banner { background: #ffffff; padding: 28px 40px; display: flex; align-items: center; gap: 26px; position: relative; overflow: hidden; border-bottom: 2px solid #e4e7ef; }
   .hero-text { flex: 1; z-index: 1; display: flex; flex-direction: column; gap: 5px; }
   .hero-school-name { font-size: clamp(19px, 2.6vw, 32px); font-weight: 800; color: #0a1a4e; letter-spacing: -0.2px; line-height: 1.15; }
   .hero-desc { font-size: 13px; color: #444; }
@@ -99,117 +201,35 @@
   .hero-location { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: #0a1a4e; font-weight: 500; margin-top: 1px; }
   .hero-location svg { color: #0a1a4e; opacity: 0.7; }
 
-  .content { padding: 24px 28px; flex: 1; background: #f6f7f9; background-image: none; }
+  .content { padding: 24px 28px; flex: 1; background: #f6f7f9; }
   .dashboard-grid { display: grid; grid-template-columns: 340px 1fr; gap: 22px; align-items: start; }
   @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-  .welcome-card { background: #fff; background-image: none; border-radius: 14px; padding: 28px 26px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 14px; }
+  .welcome-card { background: #fff; border-radius: 14px; padding: 28px 26px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 14px; }
   .welcome-icon { width: 52px; height: 52px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
   .welcome-title { font-size: 20px; font-weight: 800; color: #0a1a4e; line-height: 1.3; }
   .welcome-text { font-size: 13px; color: var(--mid); line-height: 1.7; }
   .welcome-text strong { color: var(--dark); }
   .welcome-divider { height: 1px; background: var(--border); }
 
-  .fb-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #1877f2;
-    color: #fff;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: 'Sora', sans-serif;
-    transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
-    width: fit-content;
-    box-shadow: 0 2px 8px rgba(24,119,242,0.25);
-  }
-  .fb-btn:hover {
-    background: #1464d8;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(24,119,242,0.35);
-  }
+  .fb-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #1877f2; color: #fff; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif; transition: background 0.18s, transform 0.15s, box-shadow 0.18s; width: fit-content; box-shadow: 0 2px 8px rgba(24,119,242,0.25); }
+  .fb-btn:hover { background: #1464d8; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(24,119,242,0.35); }
   .fb-btn:active { transform: translateY(0); }
 
-  /* ── SLIDESHOW ── */
-  .slideshow-card {
-    background: #111;
-    background-image: none;
-    border-radius: 14px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    aspect-ratio: 16/9;
-    min-height: 260px;
-    user-select: none;
-  }
-
-  .slide {
-    position: absolute; inset: 0;
-    opacity: 0;
-    transition: opacity 0.75s ease;
-    display: flex; align-items: center; justify-content: center;
-    background: #0a1a4e;
-    background-image: none;
-  }
+  .slideshow-card { background: #111; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.08); aspect-ratio: 16/9; min-height: 260px; user-select: none; }
+  .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.75s ease; display: flex; align-items: center; justify-content: center; background: #0a1a4e; }
   .slide.active { opacity: 1; z-index: 1; }
   .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  .slide-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.12) 50%, transparent 100%);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .slide-progress {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: rgba(255,255,255,0.2);
-    z-index: 4;
-  }
-  .slide-progress-bar {
-    height: 100%;
-    background: rgba(255,255,255,0.85);
-    width: 0%;
-    animation: progressAnim 5s linear infinite;
-  }
-  @keyframes progressAnim {
-    from { width: 0%; }
-    to   { width: 100%; }
-  }
-
-  .slide-dots {
-    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 6px; z-index: 5;
-  }
-  .slide-dots .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    cursor: pointer; transition: all 0.25s;
-    border: none; padding: 0;
-  }
+  .slide-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.12) 50%, transparent 100%); z-index: 2; pointer-events: none; }
+  .slide-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.2); z-index: 4; }
+  .slide-progress-bar { height: 100%; background: rgba(255,255,255,0.85); width: 0%; animation: progressAnim 5s linear infinite; }
+  @keyframes progressAnim { from { width: 0%; } to { width: 100%; } }
+  .slide-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 5; }
+  .slide-dots .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.25s; border: none; padding: 0; }
   .slide-dots .dot.active { background: #fff; width: 22px; border-radius: 4px; }
+  .slide-counter { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.45); color: #fff; font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace; padding: 3px 9px; border-radius: 999px; z-index: 5; backdrop-filter: blur(4px); letter-spacing: 0.5px; }
 
-  .slide-counter {
-    position: absolute; top: 12px; right: 12px;
-    background: rgba(0,0,0,0.45);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 3px 9px;
-    border-radius: 999px;
-    z-index: 5;
-    backdrop-filter: blur(4px);
-    letter-spacing: 0.5px;
-  }
-
-  /* ── GUIDANCE SERVICES SECTION ── */
-  .services-section { padding: 0 28px 40px; background: #f6f7f9; background-image: none; }
+  .services-section { padding: 0 28px 40px; background: #f6f7f9; }
   .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 12px; gap: 10px; }
   .section-title { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .section-title-icon { width: 48px; height: 48px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 22px; }
@@ -218,87 +238,26 @@
   .section-badge { font-size: 13px; font-weight: 600; color: var(--primary); background: var(--primary-light); border: 1px solid rgba(30,77,183,0.15); padding: 6px 16px; border-radius: 20px; letter-spacing: 0.5px; }
   .section-intro { font-size: 15px; color: var(--mid); line-height: 1.7; margin-bottom: 28px; max-width: 820px; text-align: center; margin-left: auto; margin-right: auto; }
 
-  .gs-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(130px, 160px));
-    gap: 16px;
-    justify-content: center;
-    width: 100%;
-  }
+  .gs-grid { display: grid; grid-template-columns: repeat(6, minmax(130px, 160px)); gap: 16px; justify-content: center; width: 100%; }
   @media (max-width: 1100px) { .gs-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); } }
   @media (max-width: 600px)  { .gs-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); } }
 
-  .gs-card {
-    background: #fff;
-    background-image: none;
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 34px 16px 28px;
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-    cursor: pointer;
-    transition: border-color 0.22s, box-shadow 0.22s, transform 0.22s;
-    text-align: center;
-    position: relative; overflow: hidden;
-  }
-  .gs-card:hover {
-    border-color: #0d1117;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
-    transform: translateY(-3px);
-  }
-  .gs-card.gs-open {
-    border-color: #0d1117;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
-  }
+  .gs-card { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 34px 16px 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; cursor: pointer; text-align: center; position: relative; overflow: hidden; }
+  .gs-card-icon-wrap { width: 70px; height: 70px; border-radius: 18px; background: #f0f1f4; border: 1.5px solid #d8dbe6; display: flex; align-items: center; justify-content: center; font-size: 30px; transition: background 0.22s, transform 0.22s; }
+  .gs-card.card-visible:hover .gs-card-icon-wrap { transform: scale(1.08); background: #e4e7ef; }
+  .gs-card-name { font-size: 13.5px; font-weight: 800; color: #0a1a4e; line-height: 1.3; transition: color 0.2s; }
+  .gs-card.card-visible:hover .gs-card-name { color: #0d1117; }
 
-  .gs-card-icon-wrap {
-    width: 70px; height: 70px;
-    border-radius: 18px;
-    background: #f0f1f4;
-    border: 1.5px solid #d8dbe6;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px;
-    transition: background 0.22s, transform 0.22s;
-  }
-  .gs-card:hover .gs-card-icon-wrap { transform: scale(1.08); background: #e4e7ef; }
-
-  .gs-card-name {
-    font-size: 13.5px; font-weight: 800; color: #0a1a4e;
-    line-height: 1.3; transition: color 0.2s;
-  }
-  .gs-card:hover .gs-card-name { color: #0d1117; }
-
-  /* expand panel */
-  .gs-expand-row {
-    grid-column: 1 / -1;
-    display: grid; grid-template-rows: 0fr;
-    transition: grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1);
-    background: #fff;
-    background-image: none;
-    border: 1.5px solid var(--border);
-    border-radius: 14px; overflow: hidden;
-  }
-  .gs-expand-row.gs-open {
-    grid-template-rows: 1fr;
-    border-color: #0d1117;
-  }
+  .gs-expand-row { grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1); background: #fff; border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .gs-expand-row.gs-open { grid-template-rows: 1fr; border-color: #0d1117; }
   .gs-expand-inner { overflow: hidden; }
   .gs-expand-body { padding: 20px 22px 22px; }
-
-  .gs-expand-head {
-    display: flex; align-items: center; gap: 12px;
-    padding-bottom: 14px; margin-bottom: 14px;
-    border-bottom: 1px solid var(--border);
-  }
+  .gs-expand-head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
   .gs-expand-icon { font-size: 22px; }
   .gs-expand-title { font-size: 15px; font-weight: 700; color: #0a1a4e; }
   .gs-expand-desc { font-size: 12px; color: var(--light); margin-top: 2px; }
-
   .gs-sub-list { display: flex; flex-direction: column; gap: 7px; }
-  .gs-sub {
-    border: 1px solid var(--border); border-radius: 9px;
-    overflow: hidden; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
+  .gs-sub { border: 1px solid var(--border); border-radius: 9px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
   .gs-sub:hover { border-color: #0d1117; background: #f6f7f9; }
   .gs-sub.gs-sub-open { border-color: #0d1117; }
   .gs-sub-head { display: flex; align-items: center; gap: 9px; padding: 10px 14px; }
@@ -309,7 +268,6 @@
   .gs-sub-desc { font-size: 11px; color: var(--light); margin-top: 2px; line-height: 1.4; }
   .gs-sub-chev { font-size: 11px; color: var(--light); transition: transform 0.25s; }
   .gs-sub.gs-sub-open .gs-sub-chev { transform: rotate(90deg); color: #0d1117; }
-
   .gs-steps-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.32s ease; }
   .gs-sub.gs-sub-open .gs-steps-panel { grid-template-rows: 1fr; }
   .gs-steps-inner { overflow: hidden; }
@@ -317,43 +275,25 @@
   .gs-step { display: flex; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--mid); line-height: 1.5; }
   .gs-step:last-child { border-bottom: none; }
   .gs-step-num { font-size: 11px; font-weight: 700; color: #0d1117; opacity: 0.6; flex-shrink: 0; min-width: 16px; margin-top: 1px; }
-
   .gs-direct-steps { display: flex; flex-direction: column; }
   .gs-direct-step { display: flex; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--mid); line-height: 1.5; }
   .gs-direct-step:last-child { border-bottom: none; }
   .gs-direct-num { font-size: 11px; font-weight: 700; color: #0d1117; opacity: 0.6; flex-shrink: 0; min-width: 16px; margin-top: 1px; }
 
-  /* ── DEPED VMV ── */
   .vmv-section { margin-bottom: 40px; }
-  .vmv-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
-  }
+  .vmv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
   @media (max-width: 900px) { .vmv-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .vmv-grid { grid-template-columns: 1fr; } }
-  .vmv-card {
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 28px 24px 24px;
-    display: flex; flex-direction: column; gap: 14px;
-    position: relative; overflow: hidden;
-    transition: box-shadow 0.22s, transform 0.22s, border-color 0.22s;
-  }
-  .vmv-card:hover { box-shadow: 0 6px 28px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .vmv-card { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 28px 24px 24px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
   .vmv-card-vision  { border-top: 3px solid #0d1117; }
   .vmv-card-mission { border-top: 3px solid #0d1117; }
   .vmv-card-values  { border-top: 3px solid #0d1117; }
   .vmv-card-head { display: flex; align-items: center; gap: 12px; }
   .vmv-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .vmv-icon-vision  { background: rgba(13,17,23,0.07); }
+  .vmv-icon-vision { background: rgba(13,17,23,0.07); }
   .vmv-icon-mission { background: rgba(13,17,23,0.07); }
   .vmv-icon-values  { background: rgba(13,17,23,0.07); }
-  .vmv-label { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 2px; }
-  .vmv-label-vision  { color: #0d1117; }
-  .vmv-label-mission { color: #0d1117; }
-  .vmv-label-values  { color: #0d1117; }
+  .vmv-label { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 2px; color: #0d1117; }
   .vmv-title { font-size: 15px; font-weight: 800; color: #0d1117; line-height: 1.3; }
   .vmv-body { font-size: 13px; color: var(--mid); line-height: 1.75; }
   .vmv-body strong { color: var(--dark); }
@@ -362,100 +302,39 @@
   .vmv-value-dot { width: 7px; height: 7px; border-radius: 50%; background: #0d1117; flex-shrink: 0; margin-top: 5px; }
   .vmv-value-name { font-weight: 700; color: var(--dark); margin-right: 4px; }
 
-  /* ── MAP SECTION ── */
   .map-section { padding: 0 28px 40px; background: #f6f7f9; }
 
-  /* ── FOOTER ── */
-  .site-footer {
-    background: linear-gradient(180deg, #0d2252 0%, #0a1a4e 100%);
-    color: #fff;
-    font-family: 'Sora', sans-serif;
-  }
-  .footer-top {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 0.9fr;
-    gap: 32px;
-    padding: 32px 40px 28px;
-    max-width: 1280px;
-    margin: 0 auto;
-  }
+  .site-footer { background: linear-gradient(180deg, #0d2252 0%, #0a1a4e 100%); color: #fff; font-family: 'Sora', sans-serif; }
+  .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 0.9fr; gap: 32px; padding: 32px 40px 28px; max-width: 1280px; margin: 0 auto; }
   @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr; gap: 24px; padding: 28px 24px; } }
   @media (max-width: 540px) { .footer-top { grid-template-columns: 1fr; padding: 24px 18px; } }
-
   .footer-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .footer-logo { width: 40px; height: 40px; object-fit: contain; border-radius: 9px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 4px; flex-shrink: 0; }
   .footer-school-name { font-size: 14px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
   .footer-school-full { font-size: 10px; color: rgba(255,255,255,0.45); line-height: 1.4; margin-top: 2px; max-width: 140px; }
-  .footer-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 0; }
-
+  .footer-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; }
   .footer-col-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px; }
   .footer-divider { height: 2px; width: 24px; background: #4a9eff; border-radius: 2px; margin-bottom: 12px; }
   .footer-about-text { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 12px; }
-
   .footer-links-list { display: flex; flex-direction: column; gap: 7px; }
-  .footer-link {
-    font-size: 12px; color: rgba(255,255,255,0.6);
-    text-decoration: none;
-    display: flex; align-items: center; gap: 6px;
-    transition: color 0.18s, gap 0.18s;
-  }
+  .footer-link { font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.18s, gap 0.18s; }
   .footer-link::before { content: "›"; font-size: 14px; color: #4a9eff; line-height: 1; flex-shrink: 0; }
   .footer-link:hover { color: #fff; gap: 10px; }
-
-  .footer-social-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: #1877f2;
-    color: #fff; text-decoration: none; padding: 8px 14px;
-    border-radius: 8px; font-size: 12px; font-weight: 600;
-    font-family: 'Sora', sans-serif;
-    transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
-    width: fit-content; margin-bottom: 14px;
-    box-shadow: 0 2px 8px rgba(24,119,242,0.35);
-  }
+  .footer-social-btn { display: inline-flex; align-items: center; gap: 7px; background: #1877f2; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif; transition: background 0.18s, transform 0.15s, box-shadow 0.18s; width: fit-content; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(24,119,242,0.35); }
   .footer-social-btn:hover { background: #1464d8; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(24,119,242,0.45); }
-
   .footer-contact { display: flex; flex-direction: column; gap: 7px; }
   .footer-contact-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: rgba(255,255,255,0.5); }
   .footer-contact-item svg { flex-shrink: 0; color: #4a9eff; opacity: 0.8; }
-
-  .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.07);
-    background: rgba(0,0,0,0.25);
-  }
-  .footer-bottom-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 40px;
-    max-width: 1280px;
-    margin: 0 auto;
-    flex-wrap: wrap; gap: 6px;
-  }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.25); }
+  .footer-bottom-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 40px; max-width: 1280px; margin: 0 auto; flex-wrap: wrap; gap: 6px; }
   .footer-bottom-left { display: flex; align-items: center; gap: 8px; font-size: 11px; color: rgba(255,255,255,0.35); }
   .footer-bottom-logo { width: 18px; height: 18px; object-fit: contain; border-radius: 4px; opacity: 0.6; }
   .footer-bottom-right { font-size: 11px; color: rgba(255,255,255,0.25); }
 
-  /* ── LIVE SEARCH ── */
   .search-wrap { position: relative; }
-  .search-results {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    width: 320px;
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    z-index: 300;
-    overflow: hidden;
-    animation: dropIn 0.15s ease;
-  }
+  .search-results { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 320px; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.12); z-index: 300; overflow: hidden; animation: dropIn 0.15s ease; }
   .search-results.open { display: block; }
-  .search-result-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 16px; cursor: pointer;
-    transition: background 0.15s;
-    border-bottom: 1px solid var(--border);
-  }
+  .search-result-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid var(--border); }
   .search-result-item:last-child { border-bottom: none; }
   .search-result-item:hover { background: var(--bg); }
   .search-result-icon { font-size: 18px; flex-shrink: 0; width: 34px; height: 34px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
@@ -517,9 +396,7 @@
 
   <!-- HERO BANNER -->
   <div class="hero-banner">
-    <div class="">
-      <img src="logo.jpg" width="150px">
-    </div>
+    <div><img src="logo.jpg" width="150px"></div>
     <div class="hero-text">
       <div class="hero-school-name">Nabunturan National Comprehensive High School</div>
       <div class="hero-desc">The Official Guidance Portal of Nabunturan National Comprehensive High School</div>
@@ -536,63 +413,39 @@
 
   <div class="content">
     <div class="dashboard-grid">
-
-      <!-- Welcome Card -->
       <div class="welcome-card">
         <div class="welcome-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <h2 class="welcome-title">Welcome to the<br>Guidance Portal</h2>
         <p class="welcome-text">This is the official online guidance and counseling system of <strong>Nabunturan National Comprehensive High School</strong>. Our office is here to support your academic, personal, social, and career development.</p>
-
         <div class="welcome-divider"></div>
-
         <a href="https://www.facebook.com/NabunturanCompre" target="_blank" class="fb-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#fff">
-            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
           Follow us on Facebook
         </a>
       </div>
 
-      <!-- ── SLIDESHOW ── -->
-      <div class="slideshow-card" id="slideshowCard"
-           onmouseenter="pauseSlideshow()"
-           onmouseleave="resumeSlideshow()">
-
-        <div class="slide active" id="slide-0">
-          <img src="compre1.jpg" alt="NNCHS Campus"
-               onerror="this.parentElement.style.background='linear-gradient(135deg,#0a1a4e,#1e4db7)';this.style.display='none'">
-        </div>
-        <div class="slide" id="slide-1">
-          <img src="compre2.jpg" alt="NNCHS Campus 2"
-               onerror="this.parentElement.style.background='linear-gradient(135deg,#1a5c1a,#2d7a2d)';this.style.display='none'">
-        </div>
-        <div class="slide" id="slide-2">
-          <img src="hhhhh1.jpg" alt="NNCHS"
-               onerror="this.parentElement.style.background='linear-gradient(135deg,#4a1a0a,#b74d1e)';this.style.display='none'">
-        </div>
-
+      <div class="slideshow-card" id="slideshowCard" onmouseenter="pauseSlideshow()" onmouseleave="resumeSlideshow()">
+        <div class="slide active" id="slide-0"><img src="compre1.jpg" alt="NNCHS Campus" onerror="this.parentElement.style.background='linear-gradient(135deg,#0a1a4e,#1e4db7)';this.style.display='none'"></div>
+        <div class="slide" id="slide-1"><img src="compre2.jpg" alt="NNCHS Campus 2" onerror="this.parentElement.style.background='linear-gradient(135deg,#1a5c1a,#2d7a2d)';this.style.display='none'"></div>
+        <div class="slide" id="slide-2"><img src="hhhhh1.jpg" alt="NNCHS" onerror="this.parentElement.style.background='linear-gradient(135deg,#4a1a0a,#b74d1e)';this.style.display='none'"></div>
         <div class="slide-overlay"></div>
         <div class="slide-counter" id="slideCounter">1 / 3</div>
-        <div class="slide-progress">
-          <div class="slide-progress-bar" id="progressBar"></div>
-        </div>
+        <div class="slide-progress"><div class="slide-progress-bar" id="progressBar"></div></div>
         <div class="slide-dots" id="slideDots">
           <button class="dot active" onclick="goToSlide(0)" aria-label="Slide 1"></button>
           <button class="dot" onclick="goToSlide(1)" aria-label="Slide 2"></button>
           <button class="dot" onclick="goToSlide(2)" aria-label="Slide 3"></button>
         </div>
-
       </div>
-
     </div>
   </div>
 
-  <!-- ── DEPED VMV SECTION ── -->
+  <!-- DEPED VMV SECTION -->
   <div class="vmv-outer-section" id="vmv-section">
     <div class="services-section" style="padding-bottom: 10px;">
-      <div class="section-header" style="margin-bottom: 24px;">
+      <div class="section-header reveal" style="margin-bottom: 24px;">
         <div class="section-title">
           <div class="section-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
           <div class="section-title-text">DepEd Vision, Mission &amp; Core Values</div>
@@ -600,63 +453,33 @@
           <div class="section-title-sub">The guiding principles that shape quality Philippine education</div>
         </div>
       </div>
-    <div class="vmv-section">
-      <div class="vmv-grid">
-
-        <div class="vmv-card vmv-card-vision">
-          <div class="vmv-card-head">
-            <div class="vmv-icon vmv-icon-vision">&#127775;</div>
-            <div>
-              <div class="vmv-label vmv-label-vision">DepEd Vision</div>
-              <div class="vmv-title">Our Vision</div>
+      <div class="vmv-section">
+        <div class="vmv-grid">
+          <div class="vmv-card vmv-card-vision">
+            <div class="vmv-card-head"><div class="vmv-icon vmv-icon-vision">&#127775;</div><div><div class="vmv-label">DepEd Vision</div><div class="vmv-title">Our Vision</div></div></div>
+            <div class="vmv-body">We dream of <strong>Filipinos who passionately love their country</strong> and whose values and competencies enable them to realize their full potential and contribute meaningfully to building the nation.<br><br>As a learner-centered public institution, the Department of Education continuously improves itself to better serve its stakeholders.</div>
+          </div>
+          <div class="vmv-card vmv-card-mission">
+            <div class="vmv-card-head"><div class="vmv-icon vmv-icon-mission">&#127919;</div><div><div class="vmv-label">DepEd Mission</div><div class="vmv-title">Our Mission</div></div></div>
+            <div class="vmv-body">To protect and promote the <strong>right of every Filipino to quality, equitable, culture-based, and complete basic education</strong> where:<br><br>Students learn in a <strong>child-friendly, gender-sensitive, safe, and motivating environment</strong>; teachers facilitate learning and constantly nurture every learner; administrators and staff, as well as family and community are actively engaged.</div>
+          </div>
+          <div class="vmv-card vmv-card-values">
+            <div class="vmv-card-head"><div class="vmv-icon vmv-icon-values">&#128142;</div><div><div class="vmv-label">DepEd Core Values</div><div class="vmv-title">Maka-Diyos &bull; Maka-Tao &bull; Makakalikasan &bull; Makabansa</div></div></div>
+            <div class="vmv-values-list">
+              <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Maka-Diyos</span> &mdash; Loving God and obeying His laws; living a righteous and spiritual life</div></div>
+              <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Maka-Tao</span> &mdash; Loving and respecting people, their rights, and their dignity as human beings</div></div>
+              <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Makakalikasan</span> &mdash; Caring for and living in harmony with the natural environment</div></div>
+              <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Makabansa</span> &mdash; Contributing to the development of a strong and sovereign nation</div></div>
             </div>
           </div>
-          <div class="vmv-body">
-            We dream of <strong>Filipinos who passionately love their country</strong> and whose values and competencies enable them to realize their full potential and contribute meaningfully to building the nation.
-            <br><br>
-            As a learner-centered public institution, the Department of Education continuously improves itself to better serve its stakeholders.
-          </div>
         </div>
-
-        <div class="vmv-card vmv-card-mission">
-          <div class="vmv-card-head">
-            <div class="vmv-icon vmv-icon-mission">&#127919;</div>
-            <div>
-              <div class="vmv-label vmv-label-mission">DepEd Mission</div>
-              <div class="vmv-title">Our Mission</div>
-            </div>
-          </div>
-          <div class="vmv-body">
-            To protect and promote the <strong>right of every Filipino to quality, equitable, culture-based, and complete basic education</strong> where:
-            <br><br>
-            Students learn in a <strong>child-friendly, gender-sensitive, safe, and motivating environment</strong>; teachers facilitate learning and constantly nurture every learner; administrators and staff, as well as family and community are actively engaged.
-          </div>
-        </div>
-
-        <div class="vmv-card vmv-card-values">
-          <div class="vmv-card-head">
-            <div class="vmv-icon vmv-icon-values">&#128142;</div>
-            <div>
-              <div class="vmv-label vmv-label-values">DepEd Core Values</div>
-              <div class="vmv-title">Maka-Diyos &bull; Maka-Tao &bull; Makakalikasan &bull; Makabansa</div>
-            </div>
-          </div>
-          <div class="vmv-values-list">
-            <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Maka-Diyos</span> &mdash; Loving God and obeying His laws; living a righteous and spiritual life</div></div>
-            <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Maka-Tao</span> &mdash; Loving and respecting people, their rights, and their dignity as human beings</div></div>
-            <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Makakalikasan</span> &mdash; Caring for and living in harmony with the natural environment</div></div>
-            <div class="vmv-value-item"><div class="vmv-value-dot"></div><div><span class="vmv-value-name">Makabansa</span> &mdash; Contributing to the development of a strong and sovereign nation</div></div>
-          </div>
-        </div>
-
       </div>
-    </div>
     </div>
   </div>
 
-  <!-- ── GUIDANCE SERVICES SECTION ── -->
+  <!-- GUIDANCE SERVICES SECTION -->
   <div class="services-section">
-    <div class="section-header">
+    <div class="section-header reveal" style="margin-bottom:12px;">
       <div class="section-title">
         <div class="section-title-icon">🧭</div>
         <div class="section-title-text">Guidance Services</div>
@@ -664,141 +487,50 @@
         <div class="section-title-sub">Click a service to explore its process and steps</div>
       </div>
     </div>
-    <p class="section-intro">The Guidance Office of NNCHS offers various services to support every student's academic, personal, social, and career development. Click on any service below to learn more about its process.</p>
+    <p class="section-intro reveal">The Guidance Office of NNCHS offers various services to support every student's academic, personal, social, and career development. Click on any service below to learn more about its process.</p>
 
     <div class="gs-grid">
+      <div class="gs-card" onclick="gsToggle(this,'expand-01')"><div class="gs-card-icon-wrap">ℹ️</div><div class="gs-card-name">Information</div></div>
+      <div class="gs-card" onclick="gsToggle(this,'expand-02')"><div class="gs-card-icon-wrap">👤</div><div class="gs-card-name">Individual Inventory</div></div>
+      <div class="gs-card" onclick="gsToggle(this,'expand-03')"><div class="gs-card-icon-wrap">📝</div><div class="gs-card-name">Testing</div></div>
+      <div class="gs-card" onclick="gsToggle(this,'expand-04')"><div class="gs-card-icon-wrap">🚀</div><div class="gs-card-name">Career Guidance</div></div>
+      <div class="gs-card" onclick="gsToggle(this,'expand-05')"><div class="gs-card-icon-wrap">🛡️</div><div class="gs-card-name">Prevention &amp; Intervention</div></div>
+      <div class="gs-card" onclick="gsToggle(this,'expand-06')"><div class="gs-card-icon-wrap">💬</div><div class="gs-card-name">Counseling</div></div>
 
-      <div class="gs-card" onclick="gsToggle(this,'expand-01')">
-        <div class="gs-card-icon-wrap">ℹ️</div>
-        <div class="gs-card-name">Information</div>
-      </div>
-      <div class="gs-card" onclick="gsToggle(this,'expand-02')">
-        <div class="gs-card-icon-wrap">👤</div>
-        <div class="gs-card-name">Individual Inventory</div>
-      </div>
-      <div class="gs-card" onclick="gsToggle(this,'expand-03')">
-        <div class="gs-card-icon-wrap">📝</div>
-        <div class="gs-card-name">Testing</div>
-      </div>
-      <div class="gs-card" onclick="gsToggle(this,'expand-04')">
-        <div class="gs-card-icon-wrap">🚀</div>
-        <div class="gs-card-name">Career Guidance</div>
-      </div>
-      <div class="gs-card" onclick="gsToggle(this,'expand-05')">
-        <div class="gs-card-icon-wrap">🛡️</div>
-        <div class="gs-card-name">Prevention &amp; Intervention</div>
-      </div>
-      <div class="gs-card" onclick="gsToggle(this,'expand-06')">
-        <div class="gs-card-icon-wrap">💬</div>
-        <div class="gs-card-name">Counseling</div>
-      </div>
-
-      <!-- EXPAND: 01 Information -->
       <div class="gs-expand-row" id="expand-01">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">ℹ️</div>
-            <div><div class="gs-expand-title">Information</div><div class="gs-expand-desc">School orientation, curricular guidance &amp; special programs awareness</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">ℹ️</div><div><div class="gs-expand-title">Information</div><div class="gs-expand-desc">School orientation, curricular guidance &amp; special programs awareness</div></div></div>
           <div class="gs-sub-list">
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">📣</div><div class="gs-sub-info"><div class="gs-sub-name">Orientation</div><div class="gs-sub-desc">School programs, policies, rights &amp; student handbook</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Welcome briefing &amp; school vision/mission presentation</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Student handbook review &amp; rights and responsibilities overview</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Guidance office introduction &amp; available support services tour</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Q&amp;A session and acknowledgment slip signing</div></div>
-              </div></div></div>
-            </div>
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">📚</div><div class="gs-sub-info"><div class="gs-sub-name">Curricular Guiding</div><div class="gs-sub-desc">Academic advisement &amp; track/strand alignment</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Review of chosen SHS track and strand requirements</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Subject load mapping and prerequisite verification</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Academic goal-setting and study plan discussion</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Referral to class adviser if further academic support is needed</div></div>
-              </div></div></div>
-            </div>
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">⭐</div><div class="gs-sub-info"><div class="gs-sub-name">Special Programs</div><div class="gs-sub-desc">Enrichment, honors &amp; special school programs</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Overview of available special programs and eligibility criteria</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Student interest matching and program recommendation</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Application process orientation and deadline briefing</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Endorsement to program coordinator if qualified</div></div>
-              </div></div></div>
-            </div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">📣</div><div class="gs-sub-info"><div class="gs-sub-name">Orientation</div><div class="gs-sub-desc">School programs, policies, rights &amp; student handbook</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Welcome briefing &amp; school vision/mission presentation</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Student handbook review &amp; rights and responsibilities overview</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Guidance office introduction &amp; available support services tour</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Q&amp;A session and acknowledgment slip signing</div></div></div></div></div></div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">📚</div><div class="gs-sub-info"><div class="gs-sub-name">Curricular Guiding</div><div class="gs-sub-desc">Academic advisement &amp; track/strand alignment</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Review of chosen SHS track and strand requirements</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Subject load mapping and prerequisite verification</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Academic goal-setting and study plan discussion</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Referral to class adviser if further academic support is needed</div></div></div></div></div></div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">⭐</div><div class="gs-sub-info"><div class="gs-sub-name">Special Programs</div><div class="gs-sub-desc">Enrichment, honors &amp; special school programs</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Overview of available special programs and eligibility criteria</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Student interest matching and program recommendation</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Application process orientation and deadline briefing</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Endorsement to program coordinator if qualified</div></div></div></div></div></div>
           </div>
         </div></div>
       </div>
 
-      <!-- EXPAND: 02 Individual Inventory -->
       <div class="gs-expand-row" id="expand-02">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">👤</div>
-            <div><div class="gs-expand-title">Individual Inventory</div><div class="gs-expand-desc">Comprehensive student profiling &amp; exit interview for records and transitions</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">👤</div><div><div class="gs-expand-title">Individual Inventory</div><div class="gs-expand-desc">Comprehensive student profiling &amp; exit interview for records and transitions</div></div></div>
           <div class="gs-sub-list">
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">🗂️</div><div class="gs-sub-info"><div class="gs-sub-name">Student Profiling</div><div class="gs-sub-desc">Data gathering &amp; cumulative record setup</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Personal data sheet &amp; family background form completion</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Academic history &amp; previous school records review</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Interests, strengths &amp; career aspiration inventory</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Cumulative record file creation &amp; secure filing</div></div>
-              </div></div></div>
-            </div>
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">🎓</div><div class="gs-sub-info"><div class="gs-sub-name">Exit Interview</div><div class="gs-sub-desc">Grade 12 graduation clearance &amp; post-secondary review</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Academic completion verification &amp; subject clearance</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Career pathway discussion: college, TESDA, or employment</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>College entrance exam &amp; scholarship referrals</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Guidance office clearance signing for graduation</div></div>
-              </div></div></div>
-            </div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">🗂️</div><div class="gs-sub-info"><div class="gs-sub-name">Student Profiling</div><div class="gs-sub-desc">Data gathering &amp; cumulative record setup</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Personal data sheet &amp; family background form completion</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Academic history &amp; previous school records review</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Interests, strengths &amp; career aspiration inventory</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Cumulative record file creation &amp; secure filing</div></div></div></div></div></div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">🎓</div><div class="gs-sub-info"><div class="gs-sub-name">Exit Interview</div><div class="gs-sub-desc">Grade 12 graduation clearance &amp; post-secondary review</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Academic completion verification &amp; subject clearance</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Career pathway discussion: college, TESDA, or employment</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>College entrance exam &amp; scholarship referrals</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Guidance office clearance signing for graduation</div></div></div></div></div></div>
           </div>
         </div></div>
       </div>
 
-      <!-- EXPAND: 03 Testing -->
       <div class="gs-expand-row" id="expand-03">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">📝</div>
-            <div><div class="gs-expand-title">Testing</div><div class="gs-expand-desc">Exam scheduling, achievement testing &amp; psychometric assessment services</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">📝</div><div><div class="gs-expand-title">Testing</div><div class="gs-expand-desc">Exam scheduling, achievement testing &amp; psychometric assessment services</div></div></div>
           <div class="gs-sub-list">
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">📅</div><div class="gs-sub-info"><div class="gs-sub-name">Exam Schedule</div><div class="gs-sub-desc">NAT &amp; periodic exam scheduling, room assignments</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Exam schedule briefing &amp; testing room assignment</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Review materials distribution &amp; test-taking strategy tips</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Day-of exam coordination and proctor assignment</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Post-exam results collection &amp; secure filing</div></div>
-              </div></div></div>
-            </div>
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">🔬</div><div class="gs-sub-info"><div class="gs-sub-name">Testing &amp; Assessment</div><div class="gs-sub-desc">Psychometric, aptitude &amp; personality assessments</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Overview of available assessments and their purposes</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Assessment administration under counselor supervision</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Results review and interpretation session with counselor</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Action plan or referral based on assessment findings</div></div>
-              </div></div></div>
-            </div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">📅</div><div class="gs-sub-info"><div class="gs-sub-name">Exam Schedule</div><div class="gs-sub-desc">NAT &amp; periodic exam scheduling, room assignments</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Exam schedule briefing &amp; testing room assignment</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Review materials distribution &amp; test-taking strategy tips</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Day-of exam coordination and proctor assignment</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Post-exam results collection &amp; secure filing</div></div></div></div></div></div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">🔬</div><div class="gs-sub-info"><div class="gs-sub-name">Testing &amp; Assessment</div><div class="gs-sub-desc">Psychometric, aptitude &amp; personality assessments</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Overview of available assessments and their purposes</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Assessment administration under counselor supervision</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Results review and interpretation session with counselor</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Action plan or referral based on assessment findings</div></div></div></div></div></div>
           </div>
         </div></div>
       </div>
 
-      <!-- EXPAND: 04 Career Guidance -->
       <div class="gs-expand-row" id="expand-04">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">🚀</div>
-            <div><div class="gs-expand-title">Career Guidance</div><div class="gs-expand-desc">Career exploration, pathway planning &amp; post-secondary readiness support</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">🚀</div><div><div class="gs-expand-title">Career Guidance</div><div class="gs-expand-desc">Career exploration, pathway planning &amp; post-secondary readiness support</div></div></div>
           <div class="gs-direct-steps">
             <div class="gs-direct-step"><div class="gs-direct-num">i.</div><div>Career interest inventory and aptitude profiling session</div></div>
             <div class="gs-direct-step"><div class="gs-direct-num">ii.</div><div>Exploration of career paths aligned to SHS strand and interests</div></div>
@@ -808,63 +540,30 @@
         </div></div>
       </div>
 
-      <!-- EXPAND: 05 Prevention & Intervention -->
       <div class="gs-expand-row" id="expand-05">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">🛡️</div>
-            <div><div class="gs-expand-title">Prevention &amp; Intervention</div><div class="gs-expand-desc">Learner rights protection, mental health advocacy &amp; welfare programs</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">🛡️</div><div><div class="gs-expand-title">Prevention &amp; Intervention</div><div class="gs-expand-desc">Learner rights protection, mental health advocacy &amp; welfare programs</div></div></div>
           <div class="gs-sub-list">
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">⚖️</div><div class="gs-sub-info"><div class="gs-sub-name">Learner Rights &amp; Protection</div><div class="gs-sub-desc">Anti-bullying protocols &amp; safe space enforcement</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Learner rights orientation and awareness session</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Incident reporting and confidential case intake</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Investigation coordination with school administration</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Follow-up monitoring and protective action documentation</div></div>
-              </div></div></div>
-            </div>
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">🧠</div><div class="gs-sub-info"><div class="gs-sub-name">Mental Health</div><div class="gs-sub-desc">Psychosocial support &amp; mental wellness programs</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Mental wellness screening and needs assessment</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Individual or group psychosocial support session</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Coping strategies and self-care plan development</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Referral to licensed professional if clinical support is needed</div></div>
-              </div></div></div>
-            </div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">⚖️</div><div class="gs-sub-info"><div class="gs-sub-name">Learner Rights &amp; Protection</div><div class="gs-sub-desc">Anti-bullying protocols &amp; safe space enforcement</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Learner rights orientation and awareness session</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Incident reporting and confidential case intake</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Investigation coordination with school administration</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Follow-up monitoring and protective action documentation</div></div></div></div></div></div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">🧠</div><div class="gs-sub-info"><div class="gs-sub-name">Mental Health</div><div class="gs-sub-desc">Psychosocial support &amp; mental wellness programs</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Mental wellness screening and needs assessment</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Individual or group psychosocial support session</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Coping strategies and self-care plan development</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Referral to licensed professional if clinical support is needed</div></div></div></div></div></div>
           </div>
         </div></div>
       </div>
 
-      <!-- EXPAND: 06 Counseling -->
       <div class="gs-expand-row" id="expand-06">
         <div class="gs-expand-inner"><div class="gs-expand-body">
-          <div class="gs-expand-head">
-            <div class="gs-expand-icon">💬</div>
-            <div><div class="gs-expand-title">Counseling</div><div class="gs-expand-desc">One-on-one counseling sessions, appointment scheduling &amp; follow-up support</div></div>
-          </div>
+          <div class="gs-expand-head"><div class="gs-expand-icon">💬</div><div><div class="gs-expand-title">Counseling</div><div class="gs-expand-desc">One-on-one counseling sessions, appointment scheduling &amp; follow-up support</div></div></div>
           <div class="gs-sub-list">
-            <div class="gs-sub" onclick="gsSubToggle(event,this)">
-              <div class="gs-sub-head"><div class="gs-sub-icon">🗓️</div><div class="gs-sub-info"><div class="gs-sub-name">Appointment Schedule</div><div class="gs-sub-desc">Session booking, preparation &amp; follow-up planning</div></div><div class="gs-sub-chev">›</div></div>
-              <div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps">
-                <div class="gs-step"><div class="gs-step-num">i.</div><div>Student submits counseling request form or walk-in intake</div></div>
-                <div class="gs-step"><div class="gs-step-num">ii.</div><div>Counselor confirms appointment date, time &amp; session purpose</div></div>
-                <div class="gs-step"><div class="gs-step-num">iii.</div><div>Confidential one-on-one counseling session conducted</div></div>
-                <div class="gs-step"><div class="gs-step-num">iv.</div><div>Session notes filed; follow-up appointment scheduled if needed</div></div>
-              </div></div></div>
-            </div>
+            <div class="gs-sub" onclick="gsSubToggle(event,this)"><div class="gs-sub-head"><div class="gs-sub-icon">🗓️</div><div class="gs-sub-info"><div class="gs-sub-name">Appointment Schedule</div><div class="gs-sub-desc">Session booking, preparation &amp; follow-up planning</div></div><div class="gs-sub-chev">›</div></div><div class="gs-steps-panel"><div class="gs-steps-inner"><div class="gs-steps"><div class="gs-step"><div class="gs-step-num">i.</div><div>Student submits counseling request form or walk-in intake</div></div><div class="gs-step"><div class="gs-step-num">ii.</div><div>Counselor confirms appointment date, time &amp; session purpose</div></div><div class="gs-step"><div class="gs-step-num">iii.</div><div>Confidential one-on-one counseling session conducted</div></div><div class="gs-step"><div class="gs-step-num">iv.</div><div>Session notes filed; follow-up appointment scheduled if needed</div></div></div></div></div></div>
           </div>
         </div></div>
       </div>
-
     </div>
   </div>
 
-  <!-- ── MAP SECTION ── -->
+  <!-- MAP SECTION -->
   <div class="map-section">
-    <div class="section-header" style="margin-bottom: 18px;">
+    <div class="section-header reveal" style="margin-bottom: 18px;">
       <div class="section-title">
         <div class="section-title-icon">📍</div>
         <div class="section-title-text">Nabunturan National High School Location</div>
@@ -875,20 +574,16 @@
     <div id="map" style="width:100%; height:520px; border-radius:16px; border:1.5px solid #e4e7ef; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);"></div>
   </div>
 
-  <!-- ── FOOTER ── -->
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-top">
       <div class="footer-col">
         <div class="footer-logo-row">
           <img src="logo.jpg" alt="NNCHS Logo" class="footer-logo" onerror="this.style.display='none'">
-          <div>
-            <div class="footer-school-name">NNCHS</div>
-            <div class="footer-school-full">Nabunturan National Comprehensive High School</div>
-          </div>
+          <div><div class="footer-school-name">NNCHS</div><div class="footer-school-full">Nabunturan National Comprehensive High School</div></div>
         </div>
         <p class="footer-desc">All content is in the public domain unless otherwise stated. Official guidance portal of NNCHS.</p>
       </div>
-
       <div class="footer-col">
         <div class="footer-col-title">About NNCHS</div>
         <div class="footer-divider"></div>
@@ -899,7 +594,6 @@
           <a href="https://data.gov.ph" target="_blank" class="footer-link">Open Data Portal</a>
         </div>
       </div>
-
       <div class="footer-col">
         <div class="footer-col-title">Follow Us</div>
         <div class="footer-divider"></div>
@@ -908,94 +602,55 @@
           Facebook
         </a>
         <div class="footer-contact">
-          <div class="footer-contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Nabunturan, Davao de Oro
-          </div>
-          <div class="footer-contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            DepEd Accredited · Est. 1951
-          </div>
+          <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nabunturan, Davao de Oro</div>
+          <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>DepEd Accredited · Est. 1951</div>
         </div>
       </div>
     </div>
-
     <div class="footer-bottom">
       <div class="footer-bottom-inner">
-        <div class="footer-bottom-left">
-          <img src="logo.jpg" alt="NNCHS" class="footer-bottom-logo" onerror="this.style.display='none'">
-          <span>&copy; 2025 Nabunturan National Comprehensive High School. All rights reserved.</span>
-        </div>
+        <div class="footer-bottom-left"><img src="logo.jpg" alt="NNCHS" class="footer-bottom-logo" onerror="this.style.display='none'"><span>&copy; 2025 Nabunturan National Comprehensive High School. All rights reserved.</span></div>
         <div class="footer-bottom-right">Nabunturan, Davao De Oro &nbsp;·&nbsp; DepEd Accredited &nbsp;·&nbsp; Est. 1951</div>
       </div>
     </div>
   </footer>
-
 </main>
 
 <script>
+  /* ── SIDEBAR ── */
   function openSidebar()  { document.getElementById('sidebar').classList.add('open');  document.getElementById('overlay').classList.add('open'); }
   function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') { closeSidebar(); }
-  });
-
+  /* ── SLIDESHOW ── */
   var SLIDE_INTERVAL = 5000;
-  var slides    = document.querySelectorAll('.slide');
-  var dots      = document.querySelectorAll('.slide-dots .dot');
+  var slides = document.querySelectorAll('.slide');
+  var dots = document.querySelectorAll('.slide-dots .dot');
   var counterEl = document.getElementById('slideCounter');
   var progressBar = document.getElementById('progressBar');
-  var currentSlide = 0;
-  var timer = null;
-  var paused = false;
+  var currentSlide = 0, timer = null, paused = false;
 
   function showSlide(n, skipReset) {
-    slides[currentSlide].classList.remove('active');
-    dots[currentSlide].classList.remove('active');
+    slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
     currentSlide = ((n % slides.length) + slides.length) % slides.length;
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
+    slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
     counterEl.textContent = (currentSlide + 1) + ' / ' + slides.length;
     if (!skipReset) restartProgress();
   }
-
   function changeSlide(dir) { showSlide(currentSlide + dir); resetTimer(); }
-  function goToSlide(n)     { showSlide(n); resetTimer(); }
-
-  function restartProgress() {
-    progressBar.style.animation = 'none';
-    progressBar.offsetHeight;
-    progressBar.style.animation = 'progressAnim ' + (SLIDE_INTERVAL / 1000) + 's linear forwards';
-  }
-
-  function startTimer() {
-    timer = setInterval(function() {
-      if (!paused) showSlide(currentSlide + 1);
-    }, SLIDE_INTERVAL);
-  }
+  function goToSlide(n) { showSlide(n); resetTimer(); }
+  function restartProgress() { progressBar.style.animation = 'none'; progressBar.offsetHeight; progressBar.style.animation = 'progressAnim ' + (SLIDE_INTERVAL/1000) + 's linear forwards'; }
+  function startTimer() { timer = setInterval(function() { if (!paused) showSlide(currentSlide + 1); }, SLIDE_INTERVAL); }
   function resetTimer() { clearInterval(timer); startTimer(); }
-
-  function pauseSlideshow() {
-    paused = true;
-    progressBar.style.animationPlayState = 'paused';
-  }
-  function resumeSlideshow() {
-    paused = false;
-    progressBar.style.animationPlayState = 'running';
-  }
-
+  function pauseSlideshow() { paused = true; progressBar.style.animationPlayState = 'paused'; }
+  function resumeSlideshow() { paused = false; progressBar.style.animationPlayState = 'running'; }
   var touchStartX = 0;
   var card = document.getElementById('slideshowCard');
   card.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
-  card.addEventListener('touchend', function(e) {
-    var diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) { changeSlide(diff > 0 ? 1 : -1); }
-  }, { passive: true });
+  card.addEventListener('touchend', function(e) { var diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 40) changeSlide(diff > 0 ? 1 : -1); }, { passive: true });
+  restartProgress(); startTimer();
 
-  restartProgress();
-  startTimer();
-
+  /* ── GUIDANCE SERVICES ── */
   function gsToggle(card, expandId) {
     var isOpen = card.classList.contains('gs-open');
     document.querySelectorAll('.gs-card').forEach(c => c.classList.remove('gs-open'));
@@ -1003,10 +658,7 @@
     if (!isOpen) {
       card.classList.add('gs-open');
       var row = document.getElementById(expandId);
-      if (row) {
-        row.classList.add('gs-open');
-        setTimeout(function(){ row.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50);
-      }
+      if (row) { row.classList.add('gs-open'); setTimeout(function(){ row.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50); }
     }
   }
   function gsSubToggle(e, item) {
@@ -1016,39 +668,96 @@
     if (!isOpen) item.classList.add('gs-sub-open');
   }
 
-  // ── LIVE SEARCH ──
+  /* ════════════════════════════════
+     SCROLL-REVEAL OBSERVERS
+  ════════════════════════════════ */
+
+  /* Generic .reveal elements */
+  var revealObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(function(el) { revealObs.observe(el); });
+
+  /* VMV cards — staggered */
+  var vmvObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.vmv-card').forEach(function(c, i) {
+          setTimeout(function() { c.classList.add('card-visible'); }, i * 140);
+        });
+        vmvObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  var vmvGrid = document.querySelector('.vmv-grid');
+  if (vmvGrid) vmvObs.observe(vmvGrid);
+
+  /* GS cards — staggered */
+  var gsObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.gs-card').forEach(function(c, i) {
+          setTimeout(function() { c.classList.add('card-visible'); }, i * 85);
+        });
+        gsObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  var gsGrid = document.querySelector('.gs-grid');
+  if (gsGrid) gsObs.observe(gsGrid);
+
+  /* Map */
+  var mapObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('map-visible'); mapObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  var mapEl = document.getElementById('map');
+  if (mapEl) mapObs.observe(mapEl);
+
+  /* Footer */
+  var footerObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('footer-visible'); footerObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.05 });
+  var footer = document.querySelector('.site-footer');
+  if (footer) footerObs.observe(footer);
+
+  /* ── LIVE SEARCH ── */
   var searchData = [
-    { name: 'Information',                icon: 'ℹ️',  desc: 'School orientation, curricular guidance & special programs', type: 'service', expandId: 'expand-01' },
-    { name: 'Orientation',                icon: '📣', desc: 'School programs, policies, rights & student handbook',        type: 'service', expandId: 'expand-01' },
-    { name: 'Curricular Guiding',         icon: '📚', desc: 'Academic advisement & track/strand alignment',               type: 'service', expandId: 'expand-01' },
-    { name: 'Special Programs',           icon: '⭐', desc: 'Enrichment, honors & special school programs',               type: 'service', expandId: 'expand-01' },
-    { name: 'Individual Inventory',       icon: '👤', desc: 'Student profiling & exit interview for records',             type: 'service', expandId: 'expand-02' },
-    { name: 'Student Profiling',          icon: '🗂️', desc: 'Data gathering & cumulative record setup',                   type: 'service', expandId: 'expand-02' },
-    { name: 'Exit Interview',             icon: '🎓', desc: 'Grade 12 graduation clearance & post-secondary review',      type: 'service', expandId: 'expand-02' },
-    { name: 'Testing',                    icon: '📝', desc: 'Exam scheduling, achievement & psychometric assessment',     type: 'service', expandId: 'expand-03' },
-    { name: 'Exam Schedule',              icon: '📅', desc: 'NAT & periodic exam scheduling, room assignments',           type: 'service', expandId: 'expand-03' },
-    { name: 'Testing & Assessment',       icon: '🔬', desc: 'Psychometric, aptitude & personality assessments',           type: 'service', expandId: 'expand-03' },
-    { name: 'Career Guidance',            icon: '🚀', desc: 'Career exploration, pathway planning & readiness support',   type: 'service', expandId: 'expand-04' },
-    { name: 'Prevention & Intervention',  icon: '🛡️', desc: 'Learner rights protection & mental health advocacy',         type: 'service', expandId: 'expand-05' },
-    { name: 'Learner Rights & Protection',icon: '⚖️', desc: 'Anti-bullying protocols & safe space enforcement',           type: 'service', expandId: 'expand-05' },
-    { name: 'Mental Health',              icon: '🧠', desc: 'Psychosocial support & mental wellness programs',            type: 'service', expandId: 'expand-05' },
-    { name: 'Counseling',                 icon: '💬', desc: 'One-on-one sessions, appointment scheduling & follow-up',    type: 'service', expandId: 'expand-06' },
-    { name: 'Appointment Schedule',       icon: '🗓️', desc: 'Session booking, preparation & follow-up planning',          type: 'service', expandId: 'expand-06' },
-    { name: 'Home',        icon: '🏠', desc: 'Welcome to the NNCHS Guidance Portal',          type: 'section', sectionId: '.hero-banner' },
-    { name: 'Welcome',     icon: '👋', desc: 'Welcome card & guidance portal introduction',    type: 'section', sectionId: '.welcome-card' },
-    { name: 'Dashboard',   icon: '🗂️', desc: 'Main dashboard with slideshow and welcome card', type: 'section', sectionId: '.content' },
-    { name: 'Slideshow',   icon: '🖼️', desc: 'NNCHS campus photo slideshow',                  type: 'section', sectionId: '.slideshow-card' },
+    { name: 'Information', icon: 'ℹ️', desc: 'School orientation, curricular guidance & special programs', type: 'service', expandId: 'expand-01' },
+    { name: 'Orientation', icon: '📣', desc: 'School programs, policies, rights & student handbook', type: 'service', expandId: 'expand-01' },
+    { name: 'Curricular Guiding', icon: '📚', desc: 'Academic advisement & track/strand alignment', type: 'service', expandId: 'expand-01' },
+    { name: 'Special Programs', icon: '⭐', desc: 'Enrichment, honors & special school programs', type: 'service', expandId: 'expand-01' },
+    { name: 'Individual Inventory', icon: '👤', desc: 'Student profiling & exit interview for records', type: 'service', expandId: 'expand-02' },
+    { name: 'Student Profiling', icon: '🗂️', desc: 'Data gathering & cumulative record setup', type: 'service', expandId: 'expand-02' },
+    { name: 'Exit Interview', icon: '🎓', desc: 'Grade 12 graduation clearance & post-secondary review', type: 'service', expandId: 'expand-02' },
+    { name: 'Testing', icon: '📝', desc: 'Exam scheduling, achievement & psychometric assessment', type: 'service', expandId: 'expand-03' },
+    { name: 'Exam Schedule', icon: '📅', desc: 'NAT & periodic exam scheduling, room assignments', type: 'service', expandId: 'expand-03' },
+    { name: 'Testing & Assessment', icon: '🔬', desc: 'Psychometric, aptitude & personality assessments', type: 'service', expandId: 'expand-03' },
+    { name: 'Career Guidance', icon: '🚀', desc: 'Career exploration, pathway planning & readiness support', type: 'service', expandId: 'expand-04' },
+    { name: 'Prevention & Intervention', icon: '🛡️', desc: 'Learner rights protection & mental health advocacy', type: 'service', expandId: 'expand-05' },
+    { name: 'Learner Rights & Protection', icon: '⚖️', desc: 'Anti-bullying protocols & safe space enforcement', type: 'service', expandId: 'expand-05' },
+    { name: 'Mental Health', icon: '🧠', desc: 'Psychosocial support & mental wellness programs', type: 'service', expandId: 'expand-05' },
+    { name: 'Counseling', icon: '💬', desc: 'One-on-one sessions, appointment scheduling & follow-up', type: 'service', expandId: 'expand-06' },
+    { name: 'Appointment Schedule', icon: '🗓️', desc: 'Session booking, preparation & follow-up planning', type: 'service', expandId: 'expand-06' },
+    { name: 'Home', icon: '🏠', desc: 'Welcome to the NNCHS Guidance Portal', type: 'section', sectionId: '.hero-banner' },
+    { name: 'Welcome', icon: '👋', desc: 'Welcome card & guidance portal introduction', type: 'section', sectionId: '.welcome-card' },
+    { name: 'Dashboard', icon: '🗂️', desc: 'Main dashboard with slideshow and welcome card', type: 'section', sectionId: '.content' },
     { name: 'Guidance Services', icon: '🧭', desc: 'All 6 guidance services offered by NNCHS', type: 'section', sectionId: '.services-section' },
-    { name: 'Location',    icon: '📍', desc: 'NNCHS school location on satellite map',          type: 'section', sectionId: '.map-section' },
-    { name: 'Map',         icon: '🗺️', desc: 'Satellite map of Nabunturan National High School',type: 'section', sectionId: '.map-section' },
-    { name: 'Facebook',    icon: '📘', desc: 'Follow NNCHS on Facebook',                       type: 'section', sectionId: '.welcome-card' },
-    { name: 'Contact',     icon: '📞', desc: 'Contact information & school address',            type: 'section', sectionId: '.site-footer' },
-    { name: 'Vision',      icon: '🌟', desc: 'DepEd Vision — Filipinos who passionately love their country', type: 'section', sectionId: '.vmv-section' },
-    { name: 'Mission',     icon: '🎯', desc: 'DepEd Mission — Quality, equitable, complete basic education', type: 'section', sectionId: '.vmv-section' },
-    { name: 'Core Values', icon: '💎', desc: 'Maka-Diyos, Maka-Tao, Makakalikasan, Makabansa',              type: 'section', sectionId: '.vmv-section' },
+    { name: 'Location', icon: '📍', desc: 'NNCHS school location on satellite map', type: 'section', sectionId: '.map-section' },
+    { name: 'Map', icon: '🗺️', desc: 'Satellite map of Nabunturan National High School', type: 'section', sectionId: '.map-section' },
+    { name: 'Facebook', icon: '📘', desc: 'Follow NNCHS on Facebook', type: 'section', sectionId: '.welcome-card' },
+    { name: 'Contact', icon: '📞', desc: 'Contact information & school address', type: 'section', sectionId: '.site-footer' },
+    { name: 'Vision', icon: '🌟', desc: 'DepEd Vision — Filipinos who passionately love their country', type: 'section', sectionId: '.vmv-section' },
+    { name: 'Mission', icon: '🎯', desc: 'DepEd Mission — Quality, equitable, complete basic education', type: 'section', sectionId: '.vmv-section' },
+    { name: 'Core Values', icon: '💎', desc: 'Maka-Diyos, Maka-Tao, Makakalikasan, Makabansa', type: 'section', sectionId: '.vmv-section' },
   ];
 
-  var searchInput   = document.getElementById('searchInput');
+  var searchInput = document.getElementById('searchInput');
   var searchResults = document.getElementById('searchResults');
 
   function highlight(text, query) {
@@ -1056,24 +765,21 @@
     var re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
     return text.replace(re, '<span class="search-highlight">$1</span>');
   }
-
   function openExpand(expandId) {
     document.querySelectorAll('.gs-card').forEach(function(c) { c.classList.remove('gs-open'); });
     document.querySelectorAll('.gs-expand-row').forEach(function(r) { r.classList.remove('gs-open'); });
     var row = document.getElementById(expandId);
     if (row) {
       row.classList.add('gs-open');
-      var cardMap = { 'expand-01': 0, 'expand-02': 1, 'expand-03': 2, 'expand-04': 3, 'expand-05': 4, 'expand-06': 5 };
+      var cardMap = {'expand-01':0,'expand-02':1,'expand-03':2,'expand-04':3,'expand-05':4,'expand-06':5};
       var cards = document.querySelectorAll('.gs-card');
       var idx = cardMap[expandId];
       if (idx !== undefined && cards[idx]) cards[idx].classList.add('gs-open');
       setTimeout(function() { row.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80);
     }
   }
-
   function navigateTo(item) {
-    searchResults.classList.remove('open');
-    searchInput.value = '';
+    searchResults.classList.remove('open'); searchInput.value = '';
     if (item.type === 'service') {
       document.querySelector('.services-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       setTimeout(function() { openExpand(item.expandId); }, 400);
@@ -1082,75 +788,35 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-
   searchInput.addEventListener('input', function() {
-    var q = this.value.trim().toLowerCase();
-    var rawQ = this.value.trim();
+    var q = this.value.trim().toLowerCase(), rawQ = this.value.trim();
     searchResults.innerHTML = '';
     if (!q) { searchResults.classList.remove('open'); return; }
-    var matches = searchData.filter(function(item) {
-      return item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
-    });
+    var matches = searchData.filter(function(item) { return item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q); });
     if (matches.length === 0) {
       searchResults.innerHTML = '<div class="search-no-result">No results found for "<strong>' + q + '</strong>"</div>';
     } else {
       matches.forEach(function(item) {
-        var el = document.createElement('div');
-        el.className = 'search-result-item';
+        var el = document.createElement('div'); el.className = 'search-result-item';
         var tag = item.type === 'section' ? '<span class="search-tag search-tag-section">Section</span>' : '<span class="search-tag search-tag-service">Service</span>';
-        el.innerHTML =
-          '<div class="search-result-icon">' + item.icon + '</div>' +
-          '<div style="flex:1;">' +
-            '<div class="search-result-name">' + highlight(item.name, rawQ) + ' ' + tag + '</div>' +
-            '<div class="search-result-desc">' + item.desc + '</div>' +
-          '</div>' +
-          '<div class="search-result-arrow">›</div>';
+        el.innerHTML = '<div class="search-result-icon">' + item.icon + '</div><div style="flex:1;"><div class="search-result-name">' + highlight(item.name, rawQ) + ' ' + tag + '</div><div class="search-result-desc">' + item.desc + '</div></div><div class="search-result-arrow">›</div>';
         el.addEventListener('click', function() { navigateTo(item); });
         searchResults.appendChild(el);
       });
     }
     searchResults.classList.add('open');
   });
-
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.search-wrap')) { searchResults.classList.remove('open'); }
-  });
-
-  searchInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') { searchResults.classList.remove('open'); searchInput.value = ''; }
-  });
+  document.addEventListener('click', function(e) { if (!e.target.closest('.search-wrap')) searchResults.classList.remove('open'); });
+  searchInput.addEventListener('keydown', function(e) { if (e.key === 'Escape') { searchResults.classList.remove('open'); searchInput.value = ''; } });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
   var map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([7.606092, 125.962574], 15);
-  L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-    attribution: '&copy; Google Maps', maxZoom: 21, subdomains: ['mt0','mt1','mt2','mt3']
-  }).addTo(map);
-  L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
-    attribution: '', maxZoom: 21, opacity: 1, subdomains: ['mt0','mt1','mt2','mt3']
-  }).addTo(map);
-
-  var schoolIcon = L.divIcon({
-    className: '',
-    html: '<div style="width:22px;height:22px;background:#1e4db7;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 10px rgba(30,77,183,0.6);display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>',
-    iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -14]
-  });
-
-  L.marker([7.606092, 125.962574], { icon: schoolIcon })
-    .addTo(map)
-    .bindPopup(
-      '<div style="font-family:Sora,sans-serif;min-width:210px;">' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-      '<img src="logo.jpg" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e4e7ef;flex-shrink:0;" onerror="this.style.display=\'none\'">' +
-      '<div>' +
-      '<div style="font-weight:800;font-size:14px;color:#0a1a4e;margin-bottom:2px;">NNCHS</div>' +
-      '<div style="font-size:11px;color:#1e4db7;font-weight:600;line-height:1.4;">Nabunturan National Comprehensive High School</div>' +
-      '</div></div>' +
-      '<div style="font-size:11px;color:#9aa0b4;border-top:1px solid #f0f1f4;padding-top:6px;">📍 Poblacion, Nabunturan, Davao de Oro</div>' +
-      '</div>'
-    )
-    .openPopup();
+  L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 21, subdomains: ['mt0','mt1','mt2','mt3'] }).addTo(map);
+  L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', { attribution: '', maxZoom: 21, opacity: 1, subdomains: ['mt0','mt1','mt2','mt3'] }).addTo(map);
+  var schoolIcon = L.divIcon({ className: '', html: '<div style="width:22px;height:22px;background:#1e4db7;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 10px rgba(30,77,183,0.6);display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>', iconSize:[22,22], iconAnchor:[11,11], popupAnchor:[0,-14] });
+  L.marker([7.606092, 125.962574], { icon: schoolIcon }).addTo(map).bindPopup('<div style="font-family:Sora,sans-serif;min-width:210px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><img src="logo.jpg" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e4e7ef;flex-shrink:0;" onerror="this.style.display=\'none\'"><div><div style="font-weight:800;font-size:14px;color:#0a1a4e;margin-bottom:2px;">NNCHS</div><div style="font-size:11px;color:#1e4db7;font-weight:600;line-height:1.4;">Nabunturan National Comprehensive High School</div></div></div><div style="font-size:11px;color:#9aa0b4;border-top:1px solid #f0f1f4;padding-top:6px;">📍 Poblacion, Nabunturan, Davao de Oro</div></div>').openPopup();
 </script>
 
 </body>
