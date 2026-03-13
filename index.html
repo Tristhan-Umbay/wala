@@ -6,6 +6,7 @@
 <title>NNCHS — Guidance System</title>
 <link rel="icon" type="image/x-icon" href="icon.jpg">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -32,9 +33,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ════════════════════════════════
-     ANIMATION KEYFRAMES
-  ════════════════════════════════ */
   @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-18px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -60,7 +58,6 @@
     to   { opacity: 1; transform: scale(1); }
   }
 
-  /* ── PAGE LOAD: topbar, hero, welcome, slideshow ── */
   .topbar       { animation: fadeInDown 0.5s cubic-bezier(.4,0,.2,1) both; }
   .hero-banner  { animation: fadeIn 0.65s 0.1s cubic-bezier(.4,0,.2,1) both; }
 
@@ -72,10 +69,6 @@
   .welcome-card  { animation: fadeInLeft  0.65s 0.4s  cubic-bezier(.4,0,.2,1) both; }
   .slideshow-card{ animation: fadeInRight 0.65s 0.5s  cubic-bezier(.4,0,.2,1) both; }
 
-  /* ════════════════════════════════
-     SCROLL-REVEAL SYSTEM
-  ════════════════════════════════ */
-  /* Generic reveal — fade up */
   .reveal {
     opacity: 0;
     transform: translateY(32px);
@@ -92,7 +85,6 @@
     transform: translateY(0) translateX(0) scale(1);
   }
 
-  /* VMV cards — staggered fade-up */
   .vmv-card {
     opacity: 0;
     transform: translateY(26px);
@@ -104,7 +96,6 @@
   .vmv-card.card-visible { opacity: 1; transform: translateY(0); }
   .vmv-card.card-visible:hover { box-shadow: 0 6px 28px rgba(0,0,0,.08); transform: translateY(-2px); }
 
-  /* GS cards — staggered pop-up */
   .gs-card {
     opacity: 0;
     transform: translateY(20px) scale(0.96);
@@ -121,7 +112,6 @@
   }
   .gs-card.gs-open { border-color: #0d1117; box-shadow: 0 6px 24px rgba(0,0,0,.09); }
 
-  /* Map reveal */
   #map {
     opacity: 0;
     transform: translateY(22px);
@@ -131,7 +121,6 @@
   }
   #map.map-visible { opacity: 1; transform: none; }
 
-  /* Footer reveal */
   .site-footer {
     opacity: 0;
     transform: translateY(18px);
@@ -141,7 +130,6 @@
   }
   .site-footer.footer-visible { opacity: 1; transform: none; }
 
-  /* Animated underline on section titles when revealed */
   .section-title-text { position: relative; display: inline-block; }
   .section-title-text::after {
     content: '';
@@ -155,29 +143,112 @@
   }
   .reveal.visible .section-title-text::after { width: 55%; }
 
-  /* ════════════════════════════════
-     ORIGINAL STYLES (unchanged)
-  ════════════════════════════════ */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 90; backdrop-filter: blur(2px); }
   .overlay.open { display: block; }
 
-  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: var(--navy); display: flex; flex-direction: column; z-index: 100; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: 4px 0 24px rgba(0,0,0,0.18); }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
+    background: var(--navy); display: flex; flex-direction: column;
+    z-index: 100; transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+  }
   .sidebar.open { transform: translateX(0); }
-  .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .sidebar-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
   .logo-badge { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-icon {
+    width: 36px; height: 36px; background: var(--primary);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
   .logo-icon svg { width: 18px; height: 18px; }
   .logo-name { font-size: 15px; font-weight: 700; color: #fff; }
-  .logo-sub { font-size: 9.5px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
-  .close-btn { width: 30px; height: 30px; border-radius: 7px; background: rgba(255,255,255,0.06); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .logo-sub {
+    font-size: 9.5px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-top: 1px;
+  }
+  .close-btn {
+    width: 30px; height: 30px; border-radius: 7px; background: rgba(255,255,255,0.06);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
   .close-btn:hover { background: rgba(255,255,255,0.12); }
   .close-btn svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.6); }
 
+  /* ── SIDEBAR NAV ── */
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+  .sidebar-nav-label {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase;
+    color: rgba(255,255,255,0.25); font-family: 'JetBrains Mono', monospace;
+    padding: 10px 8px 4px; margin-top: 4px;
+  }
+  .sidebar-nav-item {
+    display: flex; align-items: center; gap: 11px; padding: 9px 10px;
+    border-radius: 9px; cursor: pointer; text-decoration: none;
+    transition: background 0.18s, border-color 0.18s;
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .sidebar-nav-item:hover { background: rgba(255,255,255,0.06); }
+  .sidebar-nav-item.active {
+    background: rgba(30,77,183,0.22);
+    border-color: rgba(30,77,183,0.45);
+  }
+  .sidebar-nav-item .nav-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    background: rgba(255,255,255,0.92);
+    color: #0d1117;
+  }
+  .sidebar-nav-item .nav-icon svg { stroke: #0d1117; }
+  .sidebar-nav-item.active .nav-icon {
+    background: #fff;
+    color: #1e4db7;
+  }
+  .sidebar-nav-item.active .nav-icon svg { stroke: #1e4db7; }
+  .sidebar-nav-item .nav-text { flex: 1; }
+  .sidebar-nav-item .nav-title {
+    font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.72); line-height: 1.2;
+    transition: color 0.18s;
+  }
+  .sidebar-nav-item:hover .nav-title,
+  .sidebar-nav-item.active .nav-title { color: #fff; }
+  .sidebar-nav-item .nav-sub {
+    font-size: 10.5px; color: rgba(255,255,255,0.32); margin-top: 1px;
+  }
+  .sidebar-nav-item .nav-badge {
+    font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+    background: rgba(30,77,183,0.4); color: rgba(255,255,255,0.85);
+    letter-spacing: 0.3px; flex-shrink: 0;
+  }
+  .sidebar-nav-item .nav-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #3b82f6; flex-shrink: 0;
+  }
+  .sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0; }
+
+  .sidebar-nav-item.usap-item .nav-icon { background: rgba(255,255,255,0.92); color: #0ea5e9; }
+  .sidebar-nav-item.usap-item .nav-icon svg { stroke: #0ea5e9; }
+  .sidebar-nav-item.usap-item.active,
+  .sidebar-nav-item.usap-item:hover { background: rgba(14,165,233,0.14); border-color: rgba(14,165,233,0.3); }
+  .sidebar-nav-item.usap-item.active .nav-title,
+  .sidebar-nav-item.usap-item:hover .nav-title { color: #38bdf8; }
+
   .main { flex: 1; display: flex; flex-direction: column; min-width: 0; width: 100%; background: #f6f7f9; }
 
-  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 58px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 50;
+  }
   .topbar-left { display: flex; align-items: center; gap: 14px; }
-  .hamburger { width: 36px; height: 36px; border-radius: 8px; background: transparent; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+  .hamburger {
+    width: 36px; height: 36px; border-radius: 8px; background: transparent;
+    border: 1px solid var(--border); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: all 0.18s;
+  }
   .hamburger:hover { background: var(--bg); }
   .hamburger svg { width: 16px; height: 16px; }
   .page-title { font-size: 14px; font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 6px; }
@@ -185,14 +256,38 @@
   .page-title .sep { color: var(--border); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-  .search-bar { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 16px; transition: border 0.18s, box-shadow 0.18s; width: 220px; }
+  .search-bar {
+    display: flex; align-items: center; gap: 8px; background: var(--bg);
+    border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 16px;
+    transition: border 0.18s, box-shadow 0.18s; width: 220px;
+  }
   .search-bar:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,77,183,0.08); }
   .search-bar svg { flex-shrink: 0; color: var(--light); transition: color 0.18s; }
   .search-bar:focus-within svg { color: var(--primary); }
-  .search-bar input { border: none; background: transparent; outline: none; font-size: 13px; font-family: 'Sora', sans-serif; color: var(--dark); width: 100%; }
+  .search-bar input {
+    border: none; background: transparent; outline: none;
+    font-size: 13px; font-family: 'Sora', sans-serif; color: var(--dark); width: 100%;
+  }
   .search-bar input::placeholder { color: var(--light); }
 
-  .hero-banner { background: #ffffff; padding: 28px 40px; display: flex; align-items: center; gap: 26px; position: relative; overflow: hidden; border-bottom: 2px solid #e4e7ef; }
+  .login-icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--primary-light); border: 1.5px solid rgba(30,77,183,0.18);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    text-decoration: none; color: var(--primary); flex-shrink: 0;
+    transition: background 0.18s, border-color 0.18s, transform 0.15s, box-shadow 0.18s;
+  }
+  .login-icon-btn:hover {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+    transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,77,183,0.28);
+  }
+  .login-icon-btn:active { transform: translateY(0); }
+  .login-icon-btn svg { flex-shrink: 0; }
+
+  .hero-banner {
+    background: #ffffff; padding: 28px 40px; display: flex; align-items: center;
+    gap: 26px; position: relative; overflow: hidden; border-bottom: 2px solid #e4e7ef;
+  }
   .hero-text { flex: 1; z-index: 1; display: flex; flex-direction: column; gap: 5px; }
   .hero-school-name { font-size: clamp(19px, 2.6vw, 32px); font-weight: 800; color: #0a1a4e; letter-spacing: -0.2px; line-height: 1.15; }
   .hero-desc { font-size: 13px; color: #444; }
@@ -205,18 +300,35 @@
   .dashboard-grid { display: grid; grid-template-columns: 340px 1fr; gap: 22px; align-items: start; }
   @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-  .welcome-card { background: #fff; border-radius: 14px; padding: 28px 26px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 14px; }
-  .welcome-icon { width: 52px; height: 52px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+  .welcome-card {
+    background: #fff; border-radius: 14px; padding: 28px 26px;
+    border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .welcome-icon {
+    width: 52px; height: 52px; background: var(--primary-light);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary);
+  }
   .welcome-title { font-size: 20px; font-weight: 800; color: #0a1a4e; line-height: 1.3; }
   .welcome-text { font-size: 13px; color: var(--mid); line-height: 1.7; }
   .welcome-text strong { color: var(--dark); }
   .welcome-divider { height: 1px; background: var(--border); }
 
-  .fb-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #1877f2; color: #fff; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif; transition: background 0.18s, transform 0.15s, box-shadow 0.18s; width: fit-content; box-shadow: 0 2px 8px rgba(24,119,242,0.25); }
+  .fb-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;
+    background: #1877f2; color: #fff; border-radius: 8px; text-decoration: none;
+    font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif;
+    transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+    width: fit-content; box-shadow: 0 2px 8px rgba(24,119,242,0.25);
+  }
   .fb-btn:hover { background: #1464d8; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(24,119,242,0.35); }
   .fb-btn:active { transform: translateY(0); }
 
-  .slideshow-card { background: #111; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.08); aspect-ratio: 16/9; min-height: 260px; user-select: none; }
+  .slideshow-card {
+    background: #111; border-radius: 14px; overflow: hidden; position: relative;
+    border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    aspect-ratio: 16/9; min-height: 260px; user-select: none;
+  }
   .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.75s ease; display: flex; align-items: center; justify-content: center; background: #0a1a4e; }
   .slide.active { opacity: 1; z-index: 1; }
   .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -290,7 +402,7 @@
   .vmv-card-values  { border-top: 3px solid #0d1117; }
   .vmv-card-head { display: flex; align-items: center; gap: 12px; }
   .vmv-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .vmv-icon-vision { background: rgba(13,17,23,0.07); }
+  .vmv-icon-vision  { background: rgba(13,17,23,0.07); }
   .vmv-icon-mission { background: rgba(13,17,23,0.07); }
   .vmv-icon-values  { background: rgba(13,17,23,0.07); }
   .vmv-label { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 2px; color: #0d1117; }
@@ -303,6 +415,83 @@
   .vmv-value-name { font-weight: 700; color: var(--dark); margin-right: 4px; }
 
   .map-section { padding: 0 28px 40px; background: #f6f7f9; }
+
+  /* ── USAP TAYO MODAL ── */
+  .usap-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 200; backdrop-filter: blur(3px); align-items: center; justify-content: center;
+  }
+  .usap-modal-overlay.open { display: flex; animation: fadeIn 0.2s ease both; }
+  .usap-modal {
+    background: #fff; border-radius: 18px; width: 90%; max-width: 560px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18); overflow: hidden;
+    animation: scaleUp 0.25s cubic-bezier(0.4,0,0.2,1) both;
+    display: flex; flex-direction: column; max-height: 90vh;
+  }
+  .usap-modal-header {
+    background: linear-gradient(135deg, #0a1a4e 0%, #1e4db7 100%);
+    padding: 20px 22px 18px; display: flex; align-items: center; gap: 14px;
+  }
+  .usap-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .usap-header-text { flex: 1; }
+  .usap-header-title { font-size: 15px; font-weight: 800; color: #fff; }
+  .usap-header-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .usap-online-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #4ade80; margin-right: 5px; vertical-align: middle;
+  }
+  .usap-modal-close {
+    width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.1);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff;
+    transition: background 0.18s;
+  }
+  .usap-modal-close:hover { background: rgba(255,255,255,0.2); }
+  .usap-modal-body { flex: 1; overflow-y: auto; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .usap-info-card {
+    background: #f6f7f9; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .usap-info-title { font-size: 12px; font-weight: 700; color: var(--dark); letter-spacing: 0.5px; text-transform: uppercase; }
+  .usap-info-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--mid); line-height: 1.5; }
+  .usap-info-row svg { flex-shrink: 0; margin-top: 2px; color: var(--primary); }
+  .usap-topics { display: flex; flex-wrap: wrap; gap: 7px; }
+  .usap-topic-chip {
+    background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30,77,183,0.15);
+    font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .usap-topic-chip:hover { background: rgba(30,77,183,0.15); transform: translateY(-1px); }
+  .usap-request-form { display: flex; flex-direction: column; gap: 10px; }
+  .usap-request-form label { font-size: 12px; font-weight: 700; color: var(--dark); letter-spacing: 0.3px; }
+  .usap-request-form select,
+  .usap-request-form textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 9px;
+    padding: 9px 13px; font-size: 13px; font-family: 'Sora', sans-serif; color: var(--dark);
+    background: #fff; outline: none; transition: border-color 0.18s, box-shadow 0.18s; resize: none;
+  }
+  .usap-request-form select:focus,
+  .usap-request-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,77,183,0.08); }
+  .usap-submit-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--primary); color: #fff; border: none; border-radius: 9px;
+    padding: 11px 20px; font-size: 13px; font-weight: 700; font-family: 'Sora', sans-serif;
+    cursor: pointer; transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+    box-shadow: 0 2px 8px rgba(30,77,183,0.3);
+  }
+  .usap-submit-btn:hover { background: #1640a0; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(30,77,183,0.4); }
+  .usap-submit-btn:active { transform: translateY(0); }
+  .usap-success {
+    display: none; flex-direction: column; align-items: center; gap: 12px;
+    padding: 28px 20px; text-align: center;
+  }
+  .usap-success.show { display: flex; animation: fadeInUp 0.4s ease both; }
+  .usap-success-icon { font-size: 48px; }
+  .usap-success-title { font-size: 17px; font-weight: 800; color: #0a1a4e; }
+  .usap-success-text { font-size: 13px; color: var(--mid); line-height: 1.6; }
 
   .site-footer { background: linear-gradient(180deg, #0d2252 0%, #0a1a4e 100%); color: #fff; font-family: 'Sora', sans-serif; }
   .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 0.9fr; gap: 32px; padding: 32px 40px 28px; max-width: 1280px; margin: 0 auto; }
@@ -348,35 +537,124 @@
   .search-tag-service { background: rgba(30,77,183,0.1); color: var(--primary); }
   .search-tag-section { background: rgba(16,185,129,0.1); color: #059669; }
   @keyframes dropIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── FACEBOOK FEEDS GRID ── */
+  .fb-feeds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .fb-feed-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid #e4e7ef;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 16px 14px;
+  }
+  .fb-feed-label {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px; width: 100%;
+  }
+  .fb-feed-label-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .fb-feed-label-name { font-size: 13px; font-weight: 800; color: #0a1a4e; line-height: 1.2; }
+  .fb-feed-label-sub  { font-size: 10.5px; color: #9aa0b4; }
+  @media (max-width: 900px) { .fb-feeds-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .fb-feeds-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="logo-badge">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+<!-- ── USAP TAYO MODAL ── -->
+<div class="usap-modal-overlay" id="usapModal" onclick="closeUsapModal(event)">
+  <div class="usap-modal" onclick="event.stopPropagation()">
+    <div class="usap-modal-header">
+      <div class="usap-avatar">🧑‍💼</div>
+      <div class="usap-header-text">
+        <div class="usap-header-title">Usap Tayo</div>
+        <div class="usap-header-sub"><span class="usap-online-dot"></span>Guidance Counselor — NNCHS</div>
+      </div>
+      <button class="usap-modal-close" onclick="closeUsapModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="usap-modal-body" id="usapBody">
+      <div class="usap-info-card">
+        <div class="usap-info-title">📋 Guidance Office Info</div>
+        <div class="usap-info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>Walk-in hours: <strong>Mon–Fri, 8:00 AM – 5:00 PM</strong></span>
+        </div>
+        <div class="usap-info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Guidance Office, Main Building — NNCHS, Nabunturan, Davao de Oro</span>
+        </div>
+        <div class="usap-info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <span>All sessions are <strong>strictly confidential</strong></span>
+        </div>
       </div>
       <div>
-        <div class="logo-name">NNCHS</div>
-        <div class="logo-sub">Guidance System</div>
+        <div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px;letter-spacing:0.3px;">💬 What would you like to talk about?</div>
+        <div class="usap-topics" id="usapTopics">
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Academic concerns</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Personal problems</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Bullying / harassment</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Family issues</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Career guidance</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Mental health</span>
+          <span class="usap-topic-chip" onclick="selectTopic(this)">Others</span>
+        </div>
+      </div>
+      <div class="usap-request-form" id="usapForm">
+        <label for="usapConcernType">Type of Concern</label>
+        <select id="usapConcernType">
+          <option value="">— Select a concern —</option>
+          <option>Academic concerns</option>
+          <option>Personal problems</option>
+          <option>Bullying / harassment</option>
+          <option>Family issues</option>
+          <option>Career guidance</option>
+          <option>Mental health</option>
+          <option>Others</option>
+        </select>
+        <label for="usapPreferred">Preferred Schedule</label>
+        <select id="usapPreferred">
+          <option value="">— Select a time slot —</option>
+          <option>Morning (8:00 AM – 12:00 NN)</option>
+          <option>Afternoon (1:00 PM – 5:00 PM)</option>
+          <option>Any available slot</option>
+        </select>
+        <label for="usapMessage">Brief Message <span style="font-weight:400;color:var(--light);">(optional)</span></label>
+        <textarea id="usapMessage" rows="3" placeholder="Briefly describe what you'd like to discuss..."></textarea>
+        <button class="usap-submit-btn" onclick="submitUsap()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Request a Session
+        </button>
+      </div>
+      <div class="usap-success" id="usapSuccess">
+        <div class="usap-success-icon">✅</div>
+        <div class="usap-success-title">Session Request Sent!</div>
+        <div class="usap-success-text">Your request has been submitted to the Guidance Office. A counselor will reach out to confirm your appointment. Remember, everything discussed is <strong>confidential</strong>.</div>
+        <button class="usap-submit-btn" onclick="resetUsap()" style="margin-top:4px;">Send Another Request</button>
       </div>
     </div>
-    <button class="close-btn" onclick="closeSidebar()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
   </div>
-</aside>
+</div>
+
+<script src="sidebar.js" data-active="dashboard"></script>
 
 <main class="main">
   <header class="topbar">
     <div class="topbar-left">
-      <button class="hamburger" onclick="openSidebar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
       <div class="page-title">
         <span class="crumb">NNCHS</span>
         <span class="sep">›</span>
@@ -391,6 +669,12 @@
         </div>
         <div class="search-results" id="searchResults"></div>
       </div>
+      <a href="#" class="login-icon-btn" title="Log In">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="17" height="17">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </a>
     </div>
   </header>
 
@@ -561,6 +845,100 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════════════
+       FACEBOOK FEEDS SECTION — THREE COLUMNS (NNCHS · SHS · SSLG)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="services-section" id="fb-feed-section" style="padding-bottom: 40px;">
+    <div class="section-header reveal" style="margin-bottom: 24px;">
+      <div class="section-title">
+        <div class="section-title-icon" style="background: rgba(24,119,242,0.10); color: #1877f2;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+        </div>
+        <div class="section-title-text">NNCHS Facebook Updates</div>
+        <div class="section-badge" style="background: rgba(24,119,242,0.08); color: #1877f2; border-color: rgba(24,119,242,0.18);">Latest Posts &amp; Announcements</div>
+        <div class="section-title-sub">Stay updated with the latest news from NNCHS, NNCHS SHS, and NNCHS SSLG</div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="fb-feeds-grid">
+
+        <!-- ① NNCHS Main -->
+        <div class="fb-feed-card">
+          <div class="fb-feed-label">
+            <div class="fb-feed-label-icon" style="background:rgba(24,119,242,0.10);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            </div>
+            <div>
+              <div class="fb-feed-label-name">NNCHS</div>
+              <div class="fb-feed-label-sub">Official School Page</div>
+            </div>
+          </div>
+          <iframe
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FNabunturanCompre&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
+            width="340" height="600"
+            style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
+            scrolling="no" frameborder="0" allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          </iframe>
+          <a href="https://www.facebook.com/NabunturanCompre" target="_blank" class="fb-btn" style="margin-top:12px;font-size:12px;padding:8px 14px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            View NNCHS Page
+          </a>
+        </div>
+
+        <!-- ② NNCHS SHS -->
+        <div class="fb-feed-card">
+          <div class="fb-feed-label">
+            <div class="fb-feed-label-icon" style="background:rgba(14,165,233,0.10);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#0ea5e9"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            </div>
+            <div>
+              <div class="fb-feed-label-name">NNCHS SHS</div>
+              <div class="fb-feed-label-sub">Senior High School</div>
+            </div>
+          </div>
+          <iframe
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fnnchsshs&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
+            width="340" height="600"
+            style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
+            scrolling="no" frameborder="0" allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          </iframe>
+          <a href="https://www.facebook.com/nnchsshs" target="_blank" class="fb-btn" style="margin-top:12px;font-size:12px;padding:8px 14px;background:#0ea5e9;box-shadow:0 2px 8px rgba(14,165,233,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            View NNCHS SHS Page
+          </a>
+        </div>
+
+        <!-- ③ NNCHS SSLG -->
+        <div class="fb-feed-card">
+          <div class="fb-feed-label">
+            <div class="fb-feed-label-icon" style="background:rgba(16,185,129,0.10);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            </div>
+            <div>
+              <div class="fb-feed-label-name">NNCHS SSLG</div>
+              <div class="fb-feed-label-sub">Supreme Secondary Learner Gov't</div>
+            </div>
+          </div>
+          <iframe
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FSSGCompreOfficial&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
+            width="340" height="600"
+            style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
+            scrolling="no" frameborder="0" allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          </iframe>
+          <a href="https://www.facebook.com/SSGCompreOfficial" target="_blank" class="fb-btn" style="margin-top:12px;font-size:12px;padding:8px 14px;background:#10b981;box-shadow:0 2px 8px rgba(16,185,129,0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.885v2.27h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            View NNCHS SSLG Page
+          </a>
+        </div>
+
+      </div><!-- /fb-feeds-grid -->
+    </div>
+  </div>
+
   <!-- MAP SECTION -->
   <div class="map-section">
     <div class="section-header reveal" style="margin-bottom: 18px;">
@@ -617,206 +995,201 @@
 </main>
 
 <script>
-  /* ── SIDEBAR ── */
-  function openSidebar()  { document.getElementById('sidebar').classList.add('open');  document.getElementById('overlay').classList.add('open'); }
-  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
-
-  /* ── SLIDESHOW ── */
-  var SLIDE_INTERVAL = 5000;
-  var slides = document.querySelectorAll('.slide');
-  var dots = document.querySelectorAll('.slide-dots .dot');
-  var counterEl = document.getElementById('slideCounter');
-  var progressBar = document.getElementById('progressBar');
-  var currentSlide = 0, timer = null, paused = false;
-
-  function showSlide(n, skipReset) {
-    slides[currentSlide].classList.remove('active'); dots[currentSlide].classList.remove('active');
-    currentSlide = ((n % slides.length) + slides.length) % slides.length;
-    slides[currentSlide].classList.add('active'); dots[currentSlide].classList.add('active');
-    counterEl.textContent = (currentSlide + 1) + ' / ' + slides.length;
-    if (!skipReset) restartProgress();
-  }
-  function changeSlide(dir) { showSlide(currentSlide + dir); resetTimer(); }
-  function goToSlide(n) { showSlide(n); resetTimer(); }
-  function restartProgress() { progressBar.style.animation = 'none'; progressBar.offsetHeight; progressBar.style.animation = 'progressAnim ' + (SLIDE_INTERVAL/1000) + 's linear forwards'; }
-  function startTimer() { timer = setInterval(function() { if (!paused) showSlide(currentSlide + 1); }, SLIDE_INTERVAL); }
-  function resetTimer() { clearInterval(timer); startTimer(); }
-  function pauseSlideshow() { paused = true; progressBar.style.animationPlayState = 'paused'; }
-  function resumeSlideshow() { paused = false; progressBar.style.animationPlayState = 'running'; }
-  var touchStartX = 0;
-  var card = document.getElementById('slideshowCard');
-  card.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
-  card.addEventListener('touchend', function(e) { var diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 40) changeSlide(diff > 0 ? 1 : -1); }, { passive: true });
-  restartProgress(); startTimer();
-
-  /* ── GUIDANCE SERVICES ── */
-  function gsToggle(card, expandId) {
-    var isOpen = card.classList.contains('gs-open');
-    document.querySelectorAll('.gs-card').forEach(c => c.classList.remove('gs-open'));
-    document.querySelectorAll('.gs-expand-row').forEach(r => r.classList.remove('gs-open'));
-    if (!isOpen) {
-      card.classList.add('gs-open');
-      var row = document.getElementById(expandId);
-      if (row) { row.classList.add('gs-open'); setTimeout(function(){ row.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50); }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeUsapModal(); });
+  function openUsapModal() { document.getElementById('usapModal').classList.add('open'); }
+  function closeUsapModal(e) {
+    if (!e || e.target === document.getElementById('usapModal')) {
+      document.getElementById('usapModal').classList.remove('open');
     }
   }
-  function gsSubToggle(e, item) {
-    e.stopPropagation();
-    var isOpen = item.classList.contains('gs-sub-open');
-    item.closest('.gs-sub-list').querySelectorAll('.gs-sub').forEach(s => s.classList.remove('gs-sub-open'));
-    if (!isOpen) item.classList.add('gs-sub-open');
+  function selectTopic(chip) {
+    document.querySelectorAll('.usap-topic-chip').forEach(function(c){ c.style.background=''; c.style.color=''; });
+    chip.style.background='rgba(30,77,183,0.22)'; chip.style.color='#1e4db7';
+    var select=document.getElementById('usapConcernType');
+    for(var i=0;i<select.options.length;i++){ if(select.options[i].text===chip.textContent){select.selectedIndex=i;break;} }
+  }
+  function submitUsap() {
+    var concern=document.getElementById('usapConcernType').value;
+    var sched=document.getElementById('usapPreferred').value;
+    if(!concern){alert('Please select a type of concern.');return;}
+    if(!sched){alert('Please select a preferred schedule.');return;}
+    document.getElementById('usapForm').style.display='none';
+    document.getElementById('usapSuccess').classList.add('show');
+  }
+  function resetUsap() {
+    document.getElementById('usapConcernType').value='';
+    document.getElementById('usapPreferred').value='';
+    document.getElementById('usapMessage').value='';
+    document.querySelectorAll('.usap-topic-chip').forEach(function(c){c.style.background='';c.style.color='';});
+    document.getElementById('usapForm').style.display='';
+    document.getElementById('usapSuccess').classList.remove('show');
   }
 
-  /* ════════════════════════════════
-     SCROLL-REVEAL OBSERVERS
-  ════════════════════════════════ */
+  var SLIDE_INTERVAL=5000;
+  var slides=document.querySelectorAll('.slide');
+  var dots=document.querySelectorAll('.slide-dots .dot');
+  var counterEl=document.getElementById('slideCounter');
+  var progressBar=document.getElementById('progressBar');
+  var currentSlide=0,timer=null,paused=false;
+  function showSlide(n,skipReset){
+    slides[currentSlide].classList.remove('active');dots[currentSlide].classList.remove('active');
+    currentSlide=((n%slides.length)+slides.length)%slides.length;
+    slides[currentSlide].classList.add('active');dots[currentSlide].classList.add('active');
+    counterEl.textContent=(currentSlide+1)+' / '+slides.length;
+    if(!skipReset)restartProgress();
+  }
+  function changeSlide(dir){showSlide(currentSlide+dir);resetTimer();}
+  function goToSlide(n){showSlide(n);resetTimer();}
+  function restartProgress(){progressBar.style.animation='none';progressBar.offsetHeight;progressBar.style.animation='progressAnim '+(SLIDE_INTERVAL/1000)+'s linear forwards';}
+  function startTimer(){timer=setInterval(function(){if(!paused)showSlide(currentSlide+1);},SLIDE_INTERVAL);}
+  function resetTimer(){clearInterval(timer);startTimer();}
+  function pauseSlideshow(){paused=true;progressBar.style.animationPlayState='paused';}
+  function resumeSlideshow(){paused=false;progressBar.style.animationPlayState='running';}
+  var touchStartX=0;
+  var card=document.getElementById('slideshowCard');
+  card.addEventListener('touchstart',function(e){touchStartX=e.changedTouches[0].clientX;},{passive:true});
+  card.addEventListener('touchend',function(e){var diff=touchStartX-e.changedTouches[0].clientX;if(Math.abs(diff)>40)changeSlide(diff>0?1:-1);},{passive:true});
+  restartProgress();startTimer();
 
-  /* Generic .reveal elements */
-  var revealObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
-  document.querySelectorAll('.reveal').forEach(function(el) { revealObs.observe(el); });
+  function gsToggle(card,expandId){
+    var isOpen=card.classList.contains('gs-open');
+    document.querySelectorAll('.gs-card').forEach(c=>c.classList.remove('gs-open'));
+    document.querySelectorAll('.gs-expand-row').forEach(r=>r.classList.remove('gs-open'));
+    if(!isOpen){
+      card.classList.add('gs-open');
+      var row=document.getElementById(expandId);
+      if(row){row.classList.add('gs-open');setTimeout(function(){row.scrollIntoView({behavior:'smooth',block:'nearest'});},50);}
+    }
+  }
+  function gsSubToggle(e,item){
+    e.stopPropagation();
+    var isOpen=item.classList.contains('gs-sub-open');
+    item.closest('.gs-sub-list').querySelectorAll('.gs-sub').forEach(s=>s.classList.remove('gs-sub-open'));
+    if(!isOpen)item.classList.add('gs-sub-open');
+  }
 
-  /* VMV cards — staggered */
-  var vmvObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.vmv-card').forEach(function(c, i) {
-          setTimeout(function() { c.classList.add('card-visible'); }, i * 140);
-        });
+  var revealObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');revealObs.unobserve(e.target);}});
+  },{threshold:0.12,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){revealObs.observe(el);});
+
+  var vmvObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.querySelectorAll('.vmv-card').forEach(function(c,i){setTimeout(function(){c.classList.add('card-visible');},i*140);});
         vmvObs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.08 });
-  var vmvGrid = document.querySelector('.vmv-grid');
-  if (vmvGrid) vmvObs.observe(vmvGrid);
+  },{threshold:0.08});
+  var vmvGrid=document.querySelector('.vmv-grid');
+  if(vmvGrid)vmvObs.observe(vmvGrid);
 
-  /* GS cards — staggered */
-  var gsObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.gs-card').forEach(function(c, i) {
-          setTimeout(function() { c.classList.add('card-visible'); }, i * 85);
-        });
+  var gsObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.querySelectorAll('.gs-card').forEach(function(c,i){setTimeout(function(){c.classList.add('card-visible');},i*85);});
         gsObs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.05 });
-  var gsGrid = document.querySelector('.gs-grid');
-  if (gsGrid) gsObs.observe(gsGrid);
+  },{threshold:0.05});
+  var gsGrid=document.querySelector('.gs-grid');
+  if(gsGrid)gsObs.observe(gsGrid);
 
-  /* Map */
-  var mapObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('map-visible'); mapObs.unobserve(e.target); }
-    });
-  }, { threshold: 0.1 });
-  var mapEl = document.getElementById('map');
-  if (mapEl) mapObs.observe(mapEl);
+  var mapObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('map-visible');mapObs.unobserve(e.target);}});
+  },{threshold:0.1});
+  var mapEl=document.getElementById('map');
+  if(mapEl)mapObs.observe(mapEl);
 
-  /* Footer */
-  var footerObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('footer-visible'); footerObs.unobserve(e.target); }
-    });
-  }, { threshold: 0.05 });
-  var footer = document.querySelector('.site-footer');
-  if (footer) footerObs.observe(footer);
+  var footerObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('footer-visible');footerObs.unobserve(e.target);}});
+  },{threshold:0.05});
+  var footer=document.querySelector('.site-footer');
+  if(footer)footerObs.observe(footer);
 
-  /* ── LIVE SEARCH ── */
-  var searchData = [
-    { name: 'Information', icon: 'ℹ️', desc: 'School orientation, curricular guidance & special programs', type: 'service', expandId: 'expand-01' },
-    { name: 'Orientation', icon: '📣', desc: 'School programs, policies, rights & student handbook', type: 'service', expandId: 'expand-01' },
-    { name: 'Curricular Guiding', icon: '📚', desc: 'Academic advisement & track/strand alignment', type: 'service', expandId: 'expand-01' },
-    { name: 'Special Programs', icon: '⭐', desc: 'Enrichment, honors & special school programs', type: 'service', expandId: 'expand-01' },
-    { name: 'Individual Inventory', icon: '👤', desc: 'Student profiling & exit interview for records', type: 'service', expandId: 'expand-02' },
-    { name: 'Student Profiling', icon: '🗂️', desc: 'Data gathering & cumulative record setup', type: 'service', expandId: 'expand-02' },
-    { name: 'Exit Interview', icon: '🎓', desc: 'Grade 12 graduation clearance & post-secondary review', type: 'service', expandId: 'expand-02' },
-    { name: 'Testing', icon: '📝', desc: 'Exam scheduling, achievement & psychometric assessment', type: 'service', expandId: 'expand-03' },
-    { name: 'Exam Schedule', icon: '📅', desc: 'NAT & periodic exam scheduling, room assignments', type: 'service', expandId: 'expand-03' },
-    { name: 'Testing & Assessment', icon: '🔬', desc: 'Psychometric, aptitude & personality assessments', type: 'service', expandId: 'expand-03' },
-    { name: 'Career Guidance', icon: '🚀', desc: 'Career exploration, pathway planning & readiness support', type: 'service', expandId: 'expand-04' },
-    { name: 'Prevention & Intervention', icon: '🛡️', desc: 'Learner rights protection & mental health advocacy', type: 'service', expandId: 'expand-05' },
-    { name: 'Learner Rights & Protection', icon: '⚖️', desc: 'Anti-bullying protocols & safe space enforcement', type: 'service', expandId: 'expand-05' },
-    { name: 'Mental Health', icon: '🧠', desc: 'Psychosocial support & mental wellness programs', type: 'service', expandId: 'expand-05' },
-    { name: 'Counseling', icon: '💬', desc: 'One-on-one sessions, appointment scheduling & follow-up', type: 'service', expandId: 'expand-06' },
-    { name: 'Appointment Schedule', icon: '🗓️', desc: 'Session booking, preparation & follow-up planning', type: 'service', expandId: 'expand-06' },
-    { name: 'Home', icon: '🏠', desc: 'Welcome to the NNCHS Guidance Portal', type: 'section', sectionId: '.hero-banner' },
-    { name: 'Welcome', icon: '👋', desc: 'Welcome card & guidance portal introduction', type: 'section', sectionId: '.welcome-card' },
-    { name: 'Dashboard', icon: '🗂️', desc: 'Main dashboard with slideshow and welcome card', type: 'section', sectionId: '.content' },
-    { name: 'Guidance Services', icon: '🧭', desc: 'All 6 guidance services offered by NNCHS', type: 'section', sectionId: '.services-section' },
-    { name: 'Location', icon: '📍', desc: 'NNCHS school location on satellite map', type: 'section', sectionId: '.map-section' },
-    { name: 'Map', icon: '🗺️', desc: 'Satellite map of Nabunturan National High School', type: 'section', sectionId: '.map-section' },
-    { name: 'Facebook', icon: '📘', desc: 'Follow NNCHS on Facebook', type: 'section', sectionId: '.welcome-card' },
-    { name: 'Contact', icon: '📞', desc: 'Contact information & school address', type: 'section', sectionId: '.site-footer' },
-    { name: 'Vision', icon: '🌟', desc: 'DepEd Vision — Filipinos who passionately love their country', type: 'section', sectionId: '.vmv-section' },
-    { name: 'Mission', icon: '🎯', desc: 'DepEd Mission — Quality, equitable, complete basic education', type: 'section', sectionId: '.vmv-section' },
-    { name: 'Core Values', icon: '💎', desc: 'Maka-Diyos, Maka-Tao, Makakalikasan, Makabansa', type: 'section', sectionId: '.vmv-section' },
+  var searchData=[
+    {name:'Information',icon:'ℹ️',desc:'School orientation, curricular guidance & special programs',type:'service',expandId:'expand-01'},
+    {name:'Individual Inventory',icon:'👤',desc:'Student profiling & exit interview for records',type:'service',expandId:'expand-02'},
+    {name:'Testing',icon:'📝',desc:'Exam scheduling, achievement & psychometric assessment',type:'service',expandId:'expand-03'},
+    {name:'Career Guidance',icon:'🚀',desc:'Career exploration, pathway planning & readiness support',type:'service',expandId:'expand-04'},
+    {name:'Prevention & Intervention',icon:'🛡️',desc:'Learner rights protection & mental health advocacy',type:'service',expandId:'expand-05'},
+    {name:'Counseling',icon:'💬',desc:'One-on-one sessions, appointment scheduling & follow-up',type:'service',expandId:'expand-06'},
+    {name:'Home',icon:'🏠',desc:'Welcome to the NNCHS Guidance Portal',type:'section',sectionId:'.hero-banner'},
+    {name:'Welcome',icon:'👋',desc:'Welcome card & guidance portal introduction',type:'section',sectionId:'.welcome-card'},
+    {name:'Guidance Services',icon:'🧭',desc:'All 6 guidance services offered by NNCHS',type:'section',sectionId:'.services-section'},
+    {name:'Usap Tayo',icon:'💬',desc:'Talk to the Guidance Counselor',type:'section',sectionId:'.content'},
+    {name:'Location',icon:'📍',desc:'NNCHS school location on satellite map',type:'section',sectionId:'.map-section'},
+    {name:'Map',icon:'🗺️',desc:'Satellite map of Nabunturan National High School',type:'section',sectionId:'.map-section'},
+    {name:'Facebook',icon:'📘',desc:'Follow NNCHS on Facebook',type:'section',sectionId:'#fb-feed-section'},
+    {name:'NNCHS SHS Facebook',icon:'📘',desc:'Follow NNCHS Senior High School on Facebook',type:'section',sectionId:'#fb-feed-section'},
+    {name:'NNCHS SSLG Facebook',icon:'📘',desc:'Follow NNCHS SSLG on Facebook',type:'section',sectionId:'#fb-feed-section'},
+    {name:'Announcements',icon:'📢',desc:'Latest school updates from NNCHS Facebook pages',type:'section',sectionId:'#fb-feed-section'},
+    {name:'Contact',icon:'📞',desc:'Contact information & school address',type:'section',sectionId:'.site-footer'},
+    {name:'Vision',icon:'🌟',desc:'DepEd Vision — Filipinos who passionately love their country',type:'section',sectionId:'.vmv-section'},
+    {name:'Mission',icon:'🎯',desc:'DepEd Mission — Quality, equitable, complete basic education',type:'section',sectionId:'.vmv-section'},
+    {name:'Core Values',icon:'💎',desc:'Maka-Diyos, Maka-Tao, Makakalikasan, Makabansa',type:'section',sectionId:'.vmv-section'},
   ];
 
-  var searchInput = document.getElementById('searchInput');
-  var searchResults = document.getElementById('searchResults');
-
-  function highlight(text, query) {
-    if (!query) return text;
-    var re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-    return text.replace(re, '<span class="search-highlight">$1</span>');
+  var searchInput=document.getElementById('searchInput');
+  var searchResults=document.getElementById('searchResults');
+  function highlight(text,query){
+    if(!query)return text;
+    var re=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    return text.replace(re,'<span class="search-highlight">$1</span>');
   }
-  function openExpand(expandId) {
-    document.querySelectorAll('.gs-card').forEach(function(c) { c.classList.remove('gs-open'); });
-    document.querySelectorAll('.gs-expand-row').forEach(function(r) { r.classList.remove('gs-open'); });
-    var row = document.getElementById(expandId);
-    if (row) {
+  function openExpand(expandId){
+    document.querySelectorAll('.gs-card').forEach(function(c){c.classList.remove('gs-open');});
+    document.querySelectorAll('.gs-expand-row').forEach(function(r){r.classList.remove('gs-open');});
+    var row=document.getElementById(expandId);
+    if(row){
       row.classList.add('gs-open');
-      var cardMap = {'expand-01':0,'expand-02':1,'expand-03':2,'expand-04':3,'expand-05':4,'expand-06':5};
-      var cards = document.querySelectorAll('.gs-card');
-      var idx = cardMap[expandId];
-      if (idx !== undefined && cards[idx]) cards[idx].classList.add('gs-open');
-      setTimeout(function() { row.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80);
+      var cardMap={'expand-01':0,'expand-02':1,'expand-03':2,'expand-04':3,'expand-05':4,'expand-06':5};
+      var cards=document.querySelectorAll('.gs-card');
+      var idx=cardMap[expandId];
+      if(idx!==undefined&&cards[idx])cards[idx].classList.add('gs-open');
+      setTimeout(function(){row.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
     }
   }
-  function navigateTo(item) {
-    searchResults.classList.remove('open'); searchInput.value = '';
-    if (item.type === 'service') {
-      document.querySelector('.services-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(function() { openExpand(item.expandId); }, 400);
-    } else if (item.type === 'section') {
-      var target = document.querySelector(item.sectionId);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function navigateTo(item){
+    searchResults.classList.remove('open');searchInput.value='';
+    if(item.name==='Usap Tayo'){openUsapModal();return;}
+    if(item.type==='service'){
+      document.querySelector('.services-section').scrollIntoView({behavior:'smooth',block:'start'});
+      setTimeout(function(){openExpand(item.expandId);},400);
+    } else if(item.type==='section'){
+      var target=document.querySelector(item.sectionId);
+      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
     }
   }
-  searchInput.addEventListener('input', function() {
-    var q = this.value.trim().toLowerCase(), rawQ = this.value.trim();
-    searchResults.innerHTML = '';
-    if (!q) { searchResults.classList.remove('open'); return; }
-    var matches = searchData.filter(function(item) { return item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q); });
-    if (matches.length === 0) {
-      searchResults.innerHTML = '<div class="search-no-result">No results found for "<strong>' + q + '</strong>"</div>';
+  searchInput.addEventListener('input',function(){
+    var q=this.value.trim().toLowerCase(),rawQ=this.value.trim();
+    searchResults.innerHTML='';
+    if(!q){searchResults.classList.remove('open');return;}
+    var matches=searchData.filter(function(item){return item.name.toLowerCase().includes(q)||item.desc.toLowerCase().includes(q);});
+    if(matches.length===0){
+      searchResults.innerHTML='<div class="search-no-result">No results found for "<strong>'+q+'</strong>"</div>';
     } else {
-      matches.forEach(function(item) {
-        var el = document.createElement('div'); el.className = 'search-result-item';
-        var tag = item.type === 'section' ? '<span class="search-tag search-tag-section">Section</span>' : '<span class="search-tag search-tag-service">Service</span>';
-        el.innerHTML = '<div class="search-result-icon">' + item.icon + '</div><div style="flex:1;"><div class="search-result-name">' + highlight(item.name, rawQ) + ' ' + tag + '</div><div class="search-result-desc">' + item.desc + '</div></div><div class="search-result-arrow">›</div>';
-        el.addEventListener('click', function() { navigateTo(item); });
+      matches.forEach(function(item){
+        var el=document.createElement('div');el.className='search-result-item';
+        var tag=item.type==='section'?'<span class="search-tag search-tag-section">Section</span>':'<span class="search-tag search-tag-service">Service</span>';
+        el.innerHTML='<div class="search-result-icon">'+item.icon+'</div><div style="flex:1;"><div class="search-result-name">'+highlight(item.name,rawQ)+' '+tag+'</div><div class="search-result-desc">'+item.desc+'</div></div><div class="search-result-arrow">›</div>';
+        el.addEventListener('click',function(){navigateTo(item);});
         searchResults.appendChild(el);
       });
     }
     searchResults.classList.add('open');
   });
-  document.addEventListener('click', function(e) { if (!e.target.closest('.search-wrap')) searchResults.classList.remove('open'); });
-  searchInput.addEventListener('keydown', function(e) { if (e.key === 'Escape') { searchResults.classList.remove('open'); searchInput.value = ''; } });
+  document.addEventListener('click',function(e){if(!e.target.closest('.search-wrap'))searchResults.classList.remove('open');});
+  searchInput.addEventListener('keydown',function(e){if(e.key==='Escape'){searchResults.classList.remove('open');searchInput.value='';}});
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="sidebar.js"></script>
 <script>
-  var map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([7.606092, 125.962574], 15);
-  L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 21, subdomains: ['mt0','mt1','mt2','mt3'] }).addTo(map);
-  L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', { attribution: '', maxZoom: 21, opacity: 1, subdomains: ['mt0','mt1','mt2','mt3'] }).addTo(map);
-  var schoolIcon = L.divIcon({ className: '', html: '<div style="width:22px;height:22px;background:#1e4db7;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 10px rgba(30,77,183,0.6);display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>', iconSize:[22,22], iconAnchor:[11,11], popupAnchor:[0,-14] });
-  L.marker([7.606092, 125.962574], { icon: schoolIcon }).addTo(map).bindPopup('<div style="font-family:Sora,sans-serif;min-width:210px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><img src="logo.jpg" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e4e7ef;flex-shrink:0;" onerror="this.style.display=\'none\'"><div><div style="font-weight:800;font-size:14px;color:#0a1a4e;margin-bottom:2px;">NNCHS</div><div style="font-size:11px;color:#1e4db7;font-weight:600;line-height:1.4;">Nabunturan National Comprehensive High School</div></div></div><div style="font-size:11px;color:#9aa0b4;border-top:1px solid #f0f1f4;padding-top:6px;">📍 Poblacion, Nabunturan, Davao de Oro</div></div>').openPopup();
+  var map=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([7.606092,125.962574],15);
+  L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{attribution:'&copy; Google Maps',maxZoom:21,subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
+  L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}',{attribution:'',maxZoom:21,opacity:1,subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
+  var schoolIcon=L.divIcon({className:'',html:'<div style="width:22px;height:22px;background:#1e4db7;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 10px rgba(30,77,183,0.6);display:flex;align-items:center;justify-content:center;font-size:11px;">🏫</div>',iconSize:[22,22],iconAnchor:[11,11],popupAnchor:[0,-14]});
+  L.marker([7.606092,125.962574],{icon:schoolIcon}).addTo(map).bindPopup('<div style="font-family:Sora,sans-serif;min-width:210px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><img src="logo.jpg" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid #e4e7ef;flex-shrink:0;" onerror="this.style.display=\'none\'"><div><div style="font-weight:800;font-size:14px;color:#0a1a4e;margin-bottom:2px;">NNCHS</div><div style="font-size:11px;color:#1e4db7;font-weight:600;line-height:1.4;">Nabunturan National Comprehensive High School</div></div></div><div style="font-size:11px;color:#9aa0b4;border-top:1px solid #f0f1f4;padding-top:6px;">📍 Poblacion, Nabunturan, Davao de Oro</div></div>').openPopup();
 </script>
 
 </body>
