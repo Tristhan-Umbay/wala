@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usap Tayo — NNCHS Guidance Counselor</title>
+<link rel="icon" type="image/x-icon" href="icon.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --white: #ffffff;
+    --dark: #0d1117;
+    --navy: #1a2540;
+    --mid: #5a6380;
+    --light: #9aa0b4;
+    --border: #e4e7ef;
+    --primary: #1e4db7;
+    --primary-light: rgba(30,77,183,0.08);
+    --teal: #0ea5e9;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @keyframes fadeInDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeInUp   { from { opacity:0; transform:translateY(24px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn     { from { opacity:0; } to { opacity:1; } }
+
+  /* ── HERO BANNER (matches index.html) ── */
+  .hero-banner {
+    background: #ffffff; padding: 28px 40px; display: flex; align-items: center;
+    gap: 26px; position: relative; overflow: hidden; border-bottom: 2px solid #e4e7ef;
+    animation: fadeIn 0.65s 0.1s cubic-bezier(.4,0,.2,1) both;
+  }
+  .hero-text { flex: 1; z-index: 1; display: flex; flex-direction: column; gap: 5px; }
+  .hero-school-name {
+    font-size: clamp(17px, 2.4vw, 28px); font-weight: 800; color: #0a1a4e;
+    letter-spacing: -0.2px; line-height: 1.15;
+    animation: fadeInDown 0.6s 0.22s cubic-bezier(.4,0,.2,1) both;
+  }
+  .hero-desc {
+    font-size: 13px; color: #444;
+    animation: fadeInDown 0.6s 0.34s cubic-bezier(.4,0,.2,1) both;
+  }
+  .hero-location {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: #0a1a4e; font-weight: 500; margin-top: 1px;
+    animation: fadeInDown 0.6s 0.44s cubic-bezier(.4,0,.2,1) both;
+  }
+  .hero-location svg { color: #0a1a4e; opacity: 0.7; }
+  .hero-category {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: #888; margin-top: 1px;
+    animation: fadeInDown 0.6s 0.52s cubic-bezier(.4,0,.2,1) both;
+  }
+  .hero-category svg { width: 13px; height: 13px; opacity: 0.45; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 58px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    animation: fadeInDown 0.5s cubic-bezier(.4,0,.2,1) both;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--mid); font-size: 13px; font-weight: 600; text-decoration: none;
+    padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; transition: background 0.18s, color 0.18s;
+  }
+  .back-btn:hover { background: var(--bg); color: var(--dark); }
+  .hamburger-placeholder { width: 36px; } /* reserved for injected hamburger */
+  .page-title { font-size: 14px; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 6px; }
+  .page-title .crumb { color: var(--light); font-weight: 400; font-size: 13px; }
+  .page-title .sep { color: var(--border); }
+
+  /* ── MAIN CONTENT ── */
+  html { scroll-behavior: smooth; }
+  .usap-content {
+    max-width: 1200px; margin: 24px auto 0; padding: 0 28px 60px;
+    position: relative; z-index: 2;
+    animation: fadeInUp 0.65s 0.2s cubic-bezier(.4,0,.2,1) both;
+  }
+  .usap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+  .usap-grid-full {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 720px) {
+    .usap-grid { grid-template-columns: 1fr; }
+    .usap-grid-full { grid-column: 1; }
+    .usap-content { padding: 0 16px 60px; }
+  }
+
+  /* ── CARD ── */
+  .usap-card {
+    background: #fff; border-radius: 18px; border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden; margin-bottom: 18px;
+  }
+  .usap-card-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .usap-card-header-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--primary-light); display: flex; align-items: center;
+    justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .usap-card-header-title { font-size: 14px; font-weight: 700; color: var(--dark); }
+  .usap-card-header-sub { font-size: 11.5px; color: var(--light); margin-top: 1px; }
+  .usap-card-body { padding: 18px 20px; }
+
+  /* Info rows */
+  .usap-info-row {
+    display: flex; align-items: flex-start; gap: 11px;
+    font-size: 13px; color: var(--mid); line-height: 1.55; padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .usap-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .usap-info-row svg { flex-shrink: 0; margin-top: 1px; color: var(--primary); }
+  .usap-info-row strong { color: var(--dark); }
+
+  /* Topic chips */
+  .usap-topics { display: flex; flex-wrap: wrap; gap: 8px; }
+  .usap-topic-chip {
+    background: var(--primary-light); color: var(--primary);
+    border: 1.5px solid rgba(30,77,183,0.15);
+    font-size: 12.5px; font-weight: 600; padding: 7px 15px;
+    border-radius: 20px; cursor: pointer; font-family: 'Sora', sans-serif;
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  }
+  .usap-topic-chip:hover { background: rgba(30,77,183,0.15); transform: translateY(-1px); }
+  .usap-topic-chip.selected {
+    background: var(--primary); color: #fff;
+    border-color: var(--primary);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 16px; }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-label {
+    display: block; font-size: 12.5px; font-weight: 700; color: var(--dark);
+    margin-bottom: 6px; letter-spacing: 0.2px;
+  }
+  .form-label span { font-weight: 400; color: var(--light); }
+  .form-control {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 13px; font-family: 'Sora', sans-serif;
+    color: var(--dark); background: #fff; outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,77,183,0.09); }
+  textarea.form-control { resize: none; line-height: 1.6; }
+
+  /* Submit btn */
+  .submit-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px;
+    background: var(--primary); color: #fff; border: none; border-radius: 11px;
+    padding: 14px 20px; font-size: 14px; font-weight: 700; font-family: 'Sora', sans-serif;
+    cursor: pointer; transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+    box-shadow: 0 3px 12px rgba(30,77,183,0.32); letter-spacing: 0.2px;
+  }
+  .submit-btn:hover { background: #1640a0; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(30,77,183,0.42); }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* Confidentiality note */
+  .confidential-note {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(30,77,183,0.05); border: 1px solid rgba(30,77,183,0.13);
+    border-radius: 10px; padding: 12px 15px; font-size: 12px; color: var(--mid); line-height: 1.55;
+  }
+  .confidential-note svg { flex-shrink: 0; margin-top: 1px; color: var(--primary); }
+
+  /* Steps */
+  .steps-list { display: flex; flex-direction: column; gap: 0; }
+  .step-item {
+    display: flex; gap: 14px; padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--primary-light);
+    border: 1.5px solid rgba(30,77,183,0.2); display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 800; color: var(--primary);
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 13px; color: var(--mid); line-height: 1.6; padding-top: 3px; }
+  .step-text strong { color: var(--dark); }
+
+  /* Success screen */
+  .success-screen {
+    display: none; flex-direction: column; align-items: center;
+    gap: 14px; padding: 32px 20px; text-align: center;
+  }
+  .success-screen.show { display: flex; animation: fadeInUp 0.4s ease both; }
+  .success-icon { font-size: 52px; }
+  .success-title { font-size: 20px; font-weight: 800; color: #0a1a4e; }
+  .success-text { font-size: 13px; color: var(--mid); line-height: 1.65; max-width: 380px; }
+  .success-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
+    color: #166534; font-size: 12px; font-weight: 700;
+    padding: 6px 16px; border-radius: 20px;
+  }
+  .reset-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--primary-light); color: var(--primary);
+    border: 1.5px solid rgba(30,77,183,0.2); border-radius: 10px;
+    padding: 10px 20px; font-size: 13px; font-weight: 700;
+    font-family: 'Sora', sans-serif; cursor: pointer;
+    transition: background 0.18s; margin-top: 4px;
+  }
+  .reset-btn:hover { background: rgba(30,77,183,0.14); }
+
+  /* FAQs */
+  .faq-item {
+    border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 0; cursor: pointer; font-size: 13px; font-weight: 700;
+    color: var(--dark); user-select: none; gap: 12px;
+  }
+  .faq-q:hover { color: var(--primary); }
+  .faq-chev { font-size: 16px; color: var(--light); transition: transform 0.25s; flex-shrink: 0; }
+  .faq-item.open .faq-chev { transform: rotate(90deg); color: var(--primary); }
+  .faq-a-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; }
+  .faq-item.open .faq-a-wrap { grid-template-rows: 1fr; }
+  .faq-a-inner { overflow: hidden; }
+  .faq-a { font-size: 12.5px; color: var(--mid); line-height: 1.7; padding-bottom: 13px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <!-- hamburger injected by sidebar.js -->
+    <div class="page-title">
+      <span class="crumb">NNCHS</span>
+      <span class="sep">›</span>
+      Usap Tayo
+    </div>
+  </div>
+</header>
+
+<!-- HERO BANNER — same style as index.html -->
+<div class="hero-banner">
+  <div><img src="logo.jpg" width="120px" style="border-radius:10px;" onerror="this.style.display='none'"></div>
+  <div class="hero-text">
+    <div class="hero-school-name">Usap Tayo — Guidance Counselor</div>
+    <div class="hero-desc">Talk to a guidance counselor at Nabunturan National Comprehensive High School</div>
+    <div class="hero-location">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Guidance Office, Main Building — NNCHS
+    </div>
+    <div class="hero-category">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Counseling · Strictly Confidential · Mon–Fri 8AM–5PM
+      <span style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;color:#16a34a;font-weight:600;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
+        Office Open
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="usap-content">
+<div class="usap-grid">
+
+  <!-- LEFT COL 1: Guidance Office Info -->
+  <div class="usap-card">
+    <div class="usap-card-header">
+      <div class="usap-card-header-icon">📋</div>
+      <div>
+        <div class="usap-card-header-title">Guidance Office Information</div>
+        <div class="usap-card-header-sub">What to expect before your session</div>
+      </div>
+    </div>
+    <div class="usap-card-body">
+      <div class="usap-info-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span>Walk-in hours: <strong>Mon–Fri, 8:00 AM – 5:00 PM</strong></span>
+      </div>
+      <div class="usap-info-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Guidance Office, Main Building — NNCHS, Nabunturan, Davao de Oro</span>
+      </div>
+      <div class="usap-info-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>All sessions are <strong>strictly confidential</strong></span>
+      </div>
+      <div class="usap-info-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        <span>Walk-in or send a request — a counselor will reach out to confirm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COL 1: Topic Selection -->
+  <div class="usap-card">
+    <div class="usap-card-header">
+      <div class="usap-card-header-icon">💬</div>
+      <div>
+        <div class="usap-card-header-title">What would you like to talk about?</div>
+        <div class="usap-card-header-sub">Select a topic or fill the form below</div>
+      </div>
+    </div>
+    <div class="usap-card-body">
+      <div class="usap-topics" id="usapTopics">
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Academic concerns</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Personal problems</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Bullying / harassment</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Family issues</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Career guidance</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Mental health</button>
+        <button class="usap-topic-chip" onclick="selectTopic(this)">Others</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEFT COL 2: Request Form -->
+  <div class="usap-card" id="formCard">
+    <div class="usap-card-header">
+      <div class="usap-card-header-icon">🗓️</div>
+      <div>
+        <div class="usap-card-header-title">Request a Session</div>
+        <div class="usap-card-header-sub">Fill out the form and we'll confirm your appointment</div>
+      </div>
+    </div>
+    <div class="usap-card-body" id="formBody">
+      <div class="form-group">
+        <label class="form-label" for="concernType">Type of Concern</label>
+        <select class="form-control" id="concernType">
+          <option value="">— Select a concern —</option>
+          <option>Academic concerns</option>
+          <option>Personal problems</option>
+          <option>Bullying / harassment</option>
+          <option>Family issues</option>
+          <option>Career guidance</option>
+          <option>Mental health</option>
+          <option>Others</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="preferredSched">Preferred Schedule</label>
+        <select class="form-control" id="preferredSched">
+          <option value="">— Select a time slot —</option>
+          <option>Morning (8:00 AM – 12:00 NN)</option>
+          <option>Afternoon (1:00 PM – 5:00 PM)</option>
+          <option>Any available slot</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="briefMsg">Brief Message <span>(optional)</span></label>
+        <textarea class="form-control" id="briefMsg" rows="4" placeholder="Briefly describe what you'd like to discuss..."></textarea>
+      </div>
+      <div class="confidential-note" style="margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Your request is <strong>private and confidential</strong>. Only the guidance counselor will have access to your information.</span>
+      </div>
+      <button class="submit-btn" onclick="submitRequest()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Request a Session
+      </button>
+    </div>
+    <!-- Success State -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Session Request Sent!</div>
+      <div class="success-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
+        Request received
+      </div>
+      <div class="success-text">Your request has been submitted to the Guidance Office. A counselor will reach out to confirm your appointment schedule. Remember, everything discussed is <strong>strictly confidential</strong>.</div>
+      <button class="reset-btn" onclick="resetForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.85"/></svg>
+        Submit Another Request
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT COL 2: How It Works -->
+  <div class="usap-card">
+    <div class="usap-card-header">
+      <div class="usap-card-header-icon">🔄</div>
+      <div>
+        <div class="usap-card-header-title">How It Works</div>
+        <div class="usap-card-header-sub">Your counseling journey in 4 steps</div>
+      </div>
+    </div>
+    <div class="usap-card-body">
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Submit your request</strong> — Fill out the form or walk in to the Guidance Office during office hours.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Appointment confirmation</strong> — The counselor will confirm your schedule and prepare for your session.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Confidential session</strong> — A private one-on-one session with your guidance counselor in a safe, supportive environment.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Follow-up support</strong> — Session notes are filed securely. A follow-up appointment will be scheduled if needed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL WIDTH: FAQ -->
+  <div class="usap-card usap-grid-full">
+    <div class="usap-card-header">
+      <div class="usap-card-header-icon">❓</div>
+      <div>
+        <div class="usap-card-header-title">Frequently Asked Questions</div>
+        <div class="usap-card-header-sub">Common questions about counseling sessions</div>
+      </div>
+    </div>
+    <div class="usap-card-body" style="padding-bottom:4px;">
+      <div class="faq-list" id="faqList">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is everything I say kept confidential? <span class="faq-chev">›</span></div>
+          <div class="faq-a-wrap"><div class="faq-a-inner"><div class="faq-a">Yes. All sessions with the guidance counselor are strictly confidential. Information shared during a session will not be disclosed to anyone without your consent, except in cases where your safety or the safety of others is at risk.</div></div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Do I need an appointment to see the counselor? <span class="faq-chev">›</span></div>
+          <div class="faq-a-wrap"><div class="faq-a-inner"><div class="faq-a">No, you may walk in to the Guidance Office during office hours (Mon–Fri, 8:00 AM – 5:00 PM). However, submitting a request through this form helps the counselor prepare for your session in advance.</div></div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">What topics can I talk about with the counselor? <span class="faq-chev">›</span></div>
+          <div class="faq-a-wrap"><div class="faq-a-inner"><div class="faq-a">You can discuss academic concerns, personal or family problems, mental health issues, career guidance, bullying, peer relationships, or any other concern that affects your well-being and school performance.</div></div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Will my teacher or parents be told? <span class="faq-chev">›</span></div>
+          <div class="faq-a-wrap"><div class="faq-a-inner"><div class="faq-a">Sessions are confidential. Parents or teachers are only notified in exceptional circumstances — for example, if there is an immediate risk to your safety or the safety of others.</div></div></div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How long does a session usually take? <span class="faq-chev">›</span></div>
+          <div class="faq-a-wrap"><div class="faq-a-inner"><div class="faq-a">Sessions typically last 30 to 60 minutes depending on the concern. Follow-up sessions may be arranged if needed.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end usap-grid -->
+</div><!-- end usap-content -->
+
+<script src="sidebar.js" data-active="usap"></script>
+
+<script>
+  function selectTopic(chip) {
+    document.querySelectorAll('.usap-topic-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    var sel = document.getElementById('concernType');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].text === chip.textContent.trim()) { sel.selectedIndex = i; break; }
+    }
+    // Gentle scroll — only scroll if form is not already visible
+    var formCard = document.getElementById('formCard');
+    var rect = formCard.getBoundingClientRect();
+    if (rect.top > window.innerHeight || rect.bottom < 0) {
+      formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function submitRequest() {
+    var concern = document.getElementById('concernType').value;
+    var sched   = document.getElementById('preferredSched').value;
+    if (!concern) { alert('Please select a type of concern.'); return; }
+    if (!sched)   { alert('Please select a preferred schedule.'); return; }
+    document.getElementById('formBody').style.display    = 'none';
+    document.getElementById('successScreen').classList.add('show');
+  }
+
+  function resetForm() {
+    document.getElementById('concernType').value  = '';
+    document.getElementById('preferredSched').value = '';
+    document.getElementById('briefMsg').value     = '';
+    document.querySelectorAll('.usap-topic-chip').forEach(c => c.classList.remove('selected'));
+    document.getElementById('successScreen').classList.remove('show');
+    document.getElementById('formBody').style.display = '';
+  }
+
+  function toggleFaq(item) {
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Always start at top of page
+  window.scrollTo(0, 0);
+  history.scrollRestoration = 'manual';
+</script>
+</body>
+</html>
