@@ -569,6 +569,150 @@
   .fb-feed-label-sub  { font-size: 10.5px; color: #9aa0b4; }
   @media (max-width: 900px) { .fb-feeds-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .fb-feeds-grid { grid-template-columns: 1fr; } }
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE RESPONSIVE — Android & iOS fixes
+     No horizontal overflow, no overlapping, no scroll bleed
+  ══════════════════════════════════════════════════════════ */
+
+  /* 1. Global: kill horizontal scroll & respect safe areas */
+  html {
+    overflow-x: hidden;
+    /* iOS notch / home-bar spacing */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html, body { max-width: 100vw; }
+  body { overflow-x: hidden; }
+  .main { overflow-x: hidden; min-width: 0; }
+
+  /* Body scroll lock class (applied by sidebar.js on open) */
+  body.nnchs-locked {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+  }
+
+  /* 2. Topbar — prevent crowding on narrow screens */
+  @media (max-width: 520px) {
+    .topbar { padding: 0 10px; gap: 0; }
+    .topbar-left { gap: 8px; }
+    /* Collapse search bar to icon-only on mobile */
+    .search-bar { width: 38px; padding: 7px 9px; overflow: hidden; border-radius: 50%; }
+    .search-bar input { display: none; }
+    /* Make search dropdown full-width and fixed to viewport */
+    .search-results {
+      position: fixed;
+      top: 60px;
+      left: 10px;
+      right: 10px;
+      width: auto;
+      max-height: 60vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Hide breadcrumb text to save space */
+    .page-title .crumb,
+    .page-title .sep { display: none; }
+    .page-title { font-size: 13px; }
+  }
+
+  /* 3. Hero banner — stack vertically on mobile */
+  @media (max-width: 640px) {
+    .hero-banner {
+      flex-direction: column;
+      padding: 18px 16px 20px;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .hero-banner > div:first-child img {
+      width: 72px !important;
+      height: auto;
+    }
+    .hero-school-name { font-size: clamp(16px, 4.8vw, 22px); }
+    .hero-desc { font-size: 12px; }
+  }
+
+  /* 4. Content & section padding — tighter on mobile */
+  @media (max-width: 640px) {
+    .content { padding: 14px 12px; }
+    .services-section { padding-left: 12px; padding-right: 12px; }
+    .map-section { padding-left: 12px; padding-right: 12px; }
+    .section-title-text { font-size: 20px; }
+    .section-title-sub { font-size: 13px; }
+    .section-intro { font-size: 13px; margin-bottom: 18px; }
+    .welcome-card { padding: 18px 14px; }
+    .slideshow-card { min-height: 180px; }
+    #map { height: 300px !important; }
+  }
+
+  /* 5. Guidance service cards — improve tap targets on mobile */
+  @media (max-width: 480px) {
+    .gs-card { padding: 22px 10px 18px; gap: 10px; }
+    .gs-card-icon-wrap { width: 54px; height: 54px; font-size: 24px; border-radius: 14px; }
+    .gs-card-name { font-size: 12px; }
+  }
+
+  /* 6. Facebook feeds — make iframes truly responsive */
+  .fb-feed-card { overflow: hidden; }
+  .fb-feed-card iframe {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  @media (max-width: 560px) {
+    .fb-feed-card { padding: 14px 10px 12px; }
+    .fb-feeds-grid { gap: 14px; }
+  }
+
+  /* 7. Usap Tayo Modal — slide up from bottom on mobile, respect safe areas */
+  @media (max-width: 560px) {
+    .usap-modal-overlay {
+      align-items: flex-end;
+    }
+    .usap-modal {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 20px 20px 0 0;
+      max-height: 90svh;          /* svh = small viewport height, accounts for mobile browser chrome */
+      max-height: 90vh;           /* fallback */
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      animation: slideUpModal 0.3s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes slideUpModal {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .usap-modal-body { padding: 16px 16px; }
+    .usap-modal-header { padding: 16px 16px 14px; }
+  }
+
+  /* 8. VMV grid — already responsive, but tighten padding on small screens */
+  @media (max-width: 560px) {
+    .vmv-card { padding: 20px 16px 18px; }
+  }
+
+  /* 9. Footer bottom bar — reduce padding, hide redundant right text */
+  @media (max-width: 540px) {
+    .footer-bottom-inner {
+      padding: 12px 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .footer-bottom-right { display: none; }
+  }
+
+  /* 10. Prevent 300ms tap delay on all interactive elements */
+  a, button, [onclick], .gs-card, .gs-sub, .usap-topic-chip,
+  .nnchs-hamburger, .fb-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 11. Ensure no fixed-width element causes horizontal overflow */
+  img { max-width: 100%; height: auto; }
+  .hero-banner img { max-width: none; } /* override for logo (has explicit width) */
 </style>
 </head>
 <body>
@@ -876,7 +1020,7 @@
           </div>
           <iframe
             src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FNabunturanCompre&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
-            width="340" height="600"
+            width="100%" height="600"
             style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
             scrolling="no" frameborder="0" allowfullscreen="true"
             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
@@ -900,7 +1044,7 @@
           </div>
           <iframe
             src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fnnchsshs&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
-            width="340" height="600"
+            width="100%" height="600"
             style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
             scrolling="no" frameborder="0" allowfullscreen="true"
             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
@@ -924,7 +1068,7 @@
           </div>
           <iframe
             src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FSSGCompreOfficial&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&appId"
-            width="340" height="600"
+            width="100%" height="600"
             style="border:none;overflow:hidden;border-radius:10px;display:block;max-width:100%;"
             scrolling="no" frameborder="0" allowfullscreen="true"
             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
@@ -996,10 +1140,28 @@
 
 <script>
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeUsapModal(); });
-  function openUsapModal() { document.getElementById('usapModal').classList.add('open'); }
+
+  /* iOS-safe scroll lock (mirrors sidebar.js approach) */
+  var _modalScrollY = 0;
+  function _lockForModal() {
+    _modalScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    document.body.style.top = '-' + _modalScrollY + 'px';
+    document.body.classList.add('nnchs-locked');
+  }
+  function _unlockForModal() {
+    document.body.classList.remove('nnchs-locked');
+    document.body.style.top = '';
+    window.scrollTo({ top: _modalScrollY, behavior: 'instant' });
+  }
+
+  function openUsapModal() {
+    document.getElementById('usapModal').classList.add('open');
+    _lockForModal();
+  }
   function closeUsapModal(e) {
     if (!e || e.target === document.getElementById('usapModal')) {
       document.getElementById('usapModal').classList.remove('open');
+      _unlockForModal();
     }
   }
   function selectTopic(chip) {
